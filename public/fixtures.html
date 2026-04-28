@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUINIX — Fixtures Liga MX</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --qx-green:#1DB954;--qx-green-light:#7ED957;--qx-gold:#F5C518;
+  --qx-red:#D62828;--qx-blue:#1A3FA8;
+  --qx-bg:#0B1529;--qx-card:#132040;--qx-card2:#1A2D55;
+  --qx-text:#F0F4FF;--qx-muted:#8A9FCC;--qx-border:rgba(255,255,255,0.1);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:var(--qx-text);min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid var(--qx-border);background:var(--qx-card);position:sticky;top:0;z-index:20;}
+.logo{font-size:16px;font-weight:900;letter-spacing:1px;text-decoration:none;color:var(--qx-text);}
+.logo span{color:var(--qx-green-light);}
+.btn-back{background:none;border:1.5px solid var(--qx-border);color:var(--qx-muted);padding:5px 12px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;text-decoration:none;}
+.btn-back:hover{border-color:var(--qx-text);color:var(--qx-text);}
+.league-header{background:linear-gradient(135deg,#0F2670,#1A3FA8);padding:1.25rem;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.league-logo{width:52px;height:52px;border-radius:10px;object-fit:contain;background:rgba(255,255,255,.1);padding:4px;}
+.league-info h2{font-size:18px;font-weight:800;}
+.league-info p{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px;}
+.league-stats{display:flex;gap:1.5rem;margin-top:.75rem;flex-wrap:wrap;}
+.ls-val{font-size:16px;font-weight:800;color:var(--qx-green);}
+.ls-lbl{font-size:10px;color:rgba(255,255,255,.5);}
+.jornada-wrap{background:var(--qx-card);border-bottom:1px solid var(--qx-border);position:sticky;top:53px;z-index:19;}
+.jornada-scroll{display:flex;overflow-x:auto;padding:.625rem .75rem;gap:6px;scrollbar-width:none;}
+.jornada-scroll::-webkit-scrollbar{display:none;}
+.jornada-tab{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--qx-border);background:transparent;color:var(--qx-muted);white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.jornada-tab:hover{border-color:var(--qx-green);color:var(--qx-green);}
+.jornada-tab.active{background:var(--qx-green);color:#0B1529;border-color:var(--qx-green);}
+.jornada-tab.current{border-color:var(--qx-gold);color:var(--qx-gold);}
+.jornada-tab.current.active{background:var(--qx-gold);color:#0B1529;border-color:var(--qx-gold);}
+.content{max-width:700px;margin:0 auto;padding:1.25rem;}
+.section-label{font-size:11px;font-weight:700;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:.75rem;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--qx-border);}
+.partido-card{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:12px;padding:1rem;margin-bottom:10px;transition:border-color .2s;}
+.partido-card:hover{border-color:rgba(255,255,255,.2);}
+.pc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem;}
+.pc-datetime{font-size:11px;color:var(--qx-muted);}
+.pc-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.status-ns{background:rgba(26,63,168,.25);color:#6EB5FF;}
+.status-ft{background:rgba(255,255,255,.06);color:var(--qx-muted);}
+.status-live{background:rgba(214,40,40,.15);color:#ff6b6b;animation:pulse 1.5s infinite;}
+.status-pst{background:rgba(245,197,24,.12);color:var(--qx-gold);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+.teams-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;}
+.team{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.team-logo{width:44px;height:44px;object-fit:contain;}
+.team-logo-placeholder{width:44px;height:44px;border-radius:8px;background:var(--qx-card2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--qx-muted);}
+.team-name{font-size:12px;font-weight:700;text-align:center;line-height:1.2;}
+.score-col{text-align:center;}
+.score{font-size:22px;font-weight:900;}
+.vs{font-size:12px;font-weight:700;color:var(--qx-muted);background:var(--qx-card2);padding:4px 10px;border-radius:8px;}
+.pc-venue{font-size:10px;color:var(--qx-muted);margin-top:.625rem;text-align:center;}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 1rem;gap:1rem;}
+.spinner{width:40px;height:40px;border:3px solid var(--qx-border);border-top-color:var(--qx-green);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:14px;color:var(--qx-muted);}
+.error-box{background:rgba(214,40,40,.1);border:1px solid rgba(214,40,40,.3);border-radius:12px;padding:1.5rem;text-align:center;margin:2rem auto;max-width:400px;}
+.error-icon{font-size:32px;margin-bottom:.75rem;}
+.error-title{font-size:15px;font-weight:700;color:#ff6b6b;margin-bottom:6px;}
+.error-desc{font-size:12px;color:var(--qx-muted);line-height:1.5;word-break:break-all;}
+.btn-retry{margin-top:1rem;padding:8px 20px;background:var(--qx-red);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
+.tz-note{font-size:11px;color:var(--qx-muted);text-align:center;padding:.5rem;background:rgba(255,255,255,.03);border-radius:8px;margin-bottom:1rem;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html" class="logo">QUINI<span>X</span></a>
+  <a href="crear-quiniela.html" class="btn-back">← Crear quiniela</a>
+</div>
+
+<div id="leagueHeader"></div>
+<div id="jornadaTabs" style="display:none" class="jornada-wrap">
+  <div class="jornada-scroll" id="jornadaScroll"></div>
+</div>
+
+<div class="content">
+  <div id="tzNote" class="tz-note" style="display:none"></div>
+  <div id="mainContent">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div class="loading-text">Cargando fixtures de Liga MX...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var PROXY='https://quinix-api-proxy.vercel.app/api/football';
+var LEAGUE_ID=262;
+var SEASON=2025;
+var userTZ=Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+function apiUrl(endpoint,params){
+  var p=new URLSearchParams(params);
+  p.set('endpoint',endpoint);
+  return PROXY+'?'+p.toString();
+}
+
+async function fetchFixtures(){
+  var res=await fetch(apiUrl('fixtures',{league:LEAGUE_ID,season:SEASON}));
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  var data=await res.json();
+  if(!data.response||data.response.length===0) throw new Error('Sin partidos para league='+LEAGUE_ID+' season='+SEASON);
+  return data.response;
+}
+
+async function fetchLeague(){
+  try{
+    var res=await fetch(apiUrl('leagues',{id:LEAGUE_ID,season:SEASON}));
+    var data=await res.json();
+    return data.response&&data.response[0]?data.response[0]:null;
+  }catch(e){return null;}
+}
+
+function buildLeagueHeader(league,stats){
+  var logo=league&&league.league&&league.league.logo
+    ?'<img class="league-logo" src="'+league.league.logo+'" onerror="this.style.display=\'none\'">'
+    :'<div style="width:52px;height:52px;background:rgba(255,255,255,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px">⚽</div>';
+  document.getElementById('leagueHeader').innerHTML=
+    '<div class="league-header">'+logo+
+    '<div class="league-info">'+
+      '<h2>Liga MX — Clausura 2026</h2>'+
+      '<p>Temporada 2025 · México</p>'+
+      '<div class="league-stats">'+
+        '<div><div class="ls-val">'+stats.jornadas+'</div><div class="ls-lbl">Jornadas</div></div>'+
+        '<div><div class="ls-val">'+stats.total+'</div><div class="ls-lbl">Partidos</div></div>'+
+        '<div><div class="ls-val">'+stats.played+'</div><div class="ls-lbl">Jugados</div></div>'+
+        '<div><div class="ls-val">'+stats.teams+'</div><div class="ls-lbl">Equipos</div></div>'+
+      '</div>'+
+    '</div></div>';
+}
+
+function buildPage(fixtures){
+  var rounds={};
+  fixtures.forEach(function(f){var r=f.league.round;if(!rounds[r])rounds[r]=[];rounds[r].push(f);});
+  var roundKeys=Object.keys(rounds).sort(function(a,b){return extractRoundNum(a)-extractRoundNum(b);});
+  var teams=new Set();
+  fixtures.forEach(function(f){teams.add(f.teams.home.id);teams.add(f.teams.away.id);});
+  var played=fixtures.filter(function(f){return f.fixture.status.short==='FT';}).length;
+  buildLeagueHeader(null,{jornadas:roundKeys.length,total:fixtures.length,played:played,teams:teams.size});
+
+  var now=Date.now();
+  var currentRound=roundKeys[0];
+  for(var i=0;i<roundKeys.length;i++){
+    var rf=rounds[roundKeys[i]];
+    var hasLive=rf.some(function(f){return['1H','HT','2H','ET','P','LIVE'].indexOf(f.fixture.status.short)>=0;});
+    var hasUp=rf.some(function(f){return f.fixture.status.short==='NS'&&new Date(f.fixture.date).getTime()>now;});
+    if(hasLive||hasUp){currentRound=roundKeys[i];break;}
+    currentRound=roundKeys[i];
+  }
+
+  var tzEl=document.getElementById('tzNote');
+  tzEl.style.display='block';
+  tzEl.textContent='🕐 Horarios en tu zona horaria: '+userTZ;
+
+  var scroll=document.getElementById('jornadaScroll');
+  document.getElementById('jornadaTabs').style.display='block';
+  scroll.innerHTML='';
+  var activeRound=currentRound;
+
+  roundKeys.forEach(function(r){
+    var num=extractRoundNum(r);
+    var btn=document.createElement('button');
+    btn.className='jornada-tab'+(r===currentRound?' current':'')+(r===activeRound?' active':'');
+    btn.textContent=isNaN(num)?'J?':'J'+num;
+    btn.onclick=(function(rKey,b){
+      return function(){
+        activeRound=rKey;
+        document.querySelectorAll('.jornada-tab').forEach(function(t){t.classList.remove('active');});
+        b.classList.add('active');
+        renderRound(rounds,rKey);
+        b.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+      };
+    })(r,btn);
+    scroll.appendChild(btn);
+  });
+
+  setTimeout(function(){
+    var a=scroll.querySelector('.jornada-tab.active');
+    if(a) a.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  },200);
+
+  renderRound(rounds,activeRound);
+
+  fetchLeague().then(function(league){
+    if(league&&league.league&&league.league.logo){
+      var teams=new Set();
+      fixtures.forEach(function(f){teams.add(f.teams.home.id);teams.add(f.teams.away.id);});
+      var played=fixtures.filter(function(f){return f.fixture.status.short==='FT';}).length;
+      buildLeagueHeader(league,{jornadas:roundKeys.length,total:fixtures.length,played:played,teams:teams.size});
+    }
+  });
+}
+
+function renderRound(rounds,roundKey){
+  var fixtures=rounds[roundKey]||[];
+  var main=document.getElementById('mainContent');
+  var num=extractRoundNum(roundKey);
+  var byDate={};
+  fixtures.forEach(function(f){
+    var dk=formatDate(f.fixture.date,'date');
+    if(!byDate[dk])byDate[dk]=[];
+    byDate[dk].push(f);
+  });
+  var dateKeys=Object.keys(byDate).sort();
+  var html='<div class="section-label">Jornada '+(isNaN(num)?roundKey:num)+' · '+fixtures.length+' partidos</div>';
+  if(!fixtures.length){html+='<div style="text-align:center;padding:2rem;color:var(--qx-muted)">Sin partidos.</div>';main.innerHTML=html;return;}
+  dateKeys.forEach(function(dk){
+    html+='<div class="section-label" style="margin-top:1rem">'+formatDayLabel(dk)+'</div>';
+    byDate[dk].sort(function(a,b){return new Date(a.fixture.date)-new Date(b.fixture.date);});
+    byDate[dk].forEach(function(f){html+=buildCard(f);});
+  });
+  main.innerHTML=html;
+}
+
+function buildCard(f){
+  var s=f.fixture.status.short;
+  var sc='status-ns',st=formatDate(f.fixture.date,'time');
+  if(s==='FT'||s==='AET'||s==='PEN'){sc='status-ft';st='Finalizado';}
+  else if(['1H','HT','2H','ET','P','LIVE'].indexOf(s)>=0){sc='status-live';st=(f.fixture.status.elapsed?f.fixture.status.elapsed+"'":'En vivo');}
+  else if(s==='PST'){sc='status-pst';st='Pospuesto';}
+  else if(s==='CANC'){sc='status-pst';st='Cancelado';}
+  var hasScore=f.goals.home!==null&&f.goals.away!==null;
+  var mid=hasScore?'<div class="score">'+f.goals.home+' – '+f.goals.away+'</div>':'<div class="vs">VS</div>';
+  function logo(t){
+    return t.logo
+      ?'<img class="team-logo" src="'+t.logo+'" onerror="this.outerHTML=\'<div class=team-logo-placeholder>'+t.name.substring(0,3).toUpperCase()+'</div>\'">'
+      :'<div class="team-logo-placeholder">'+t.name.substring(0,3).toUpperCase()+'</div>';
+  }
+  var venue=f.fixture.venue&&f.fixture.venue.name?'<div class="pc-venue">📍 '+f.fixture.venue.name+(f.fixture.venue.city?', '+f.fixture.venue.city:'')+'</div>':'';
+  return '<div class="partido-card">'+
+    '<div class="pc-top"><div class="pc-datetime">📅 '+formatDate(f.fixture.date,'datetime')+'</div><span class="pc-status '+sc+'">'+st+'</span></div>'+
+    '<div class="teams-row">'+
+      '<div class="team">'+logo(f.teams.home)+'<div class="team-name">'+f.teams.home.name+'</div></div>'+
+      '<div class="score-col">'+mid+'</div>'+
+      '<div class="team">'+logo(f.teams.away)+'<div class="team-name">'+f.teams.away.name+'</div></div>'+
+    '</div>'+venue+'</div>';
+}
+
+function extractRoundNum(r){var m=r.match(/(\d+)$/);return m?parseInt(m[1]):NaN;}
+
+function formatDate(dateStr,type){
+  var d=new Date(dateStr),o={timeZone:userTZ};
+  if(type==='date') return d.toLocaleDateString('es-MX',Object.assign({},o,{year:'numeric',month:'2-digit',day:'2-digit'}));
+  if(type==='time') return d.toLocaleTimeString('es-MX',Object.assign({},o,{hour:'2-digit',minute:'2-digit'}));
+  return d.toLocaleDateString('es-MX',Object.assign({},o,{weekday:'short',month:'short',day:'numeric'}))+' · '+d.toLocaleTimeString('es-MX',Object.assign({},o,{hour:'2-digit',minute:'2-digit'}));
+}
+
+function formatDayLabel(dk){
+  var p=dk.split('/');
+  var d=new Date(p[2]+'-'+p[1]+'-'+p[0]+'T12:00:00');
+  var t=new Date();t.setHours(12,0,0,0);
+  var tm=new Date(t);tm.setDate(t.getDate()+1);
+  if(d.toDateString()===t.toDateString()) return 'Hoy — '+dk;
+  if(d.toDateString()===tm.toDateString()) return 'Mañana — '+dk;
+  return d.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+}
+
+function showError(title,desc){
+  document.getElementById('mainContent').innerHTML=
+    '<div class="error-box"><div class="error-icon">⚠️</div><div class="error-title">'+title+'</div><div class="error-desc">'+desc+'</div><button class="btn-retry" onclick="init()">Reintentar</button></div>';
+}
+
+async function init(){
+  document.getElementById('mainContent').innerHTML='<div class="loading"><div class="spinner"></div><div class="loading-text">Cargando fixtures de Liga MX...</div></div>';
+  try{
+    var fixtures=await fetchFixtures();
+    buildPage(fixtures);
+  }catch(e){
+    showError('Error al cargar los datos',e.message);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
