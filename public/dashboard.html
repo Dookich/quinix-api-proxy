@@ -17,8 +17,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--qx-bg);
 .logo-text { font-size: 18px; font-weight: 900; letter-spacing: 1px; text-decoration: none; color: var(--qx-text); }
 .logo-text span { color: var(--qx-green-light); }
 .topbar-right { display: flex; align-items: center; gap: 12px; }
-.plan-badge { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 20px; }
-.badge-amateur { background: rgba(255,255,255,0.08); color: var(--qx-muted); border: 1px solid var(--qx-border); }
+.plan-badge { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 20px; background: rgba(255,255,255,0.08); color: var(--qx-muted); border: 1px solid var(--qx-border); }
 .notif-btn { position: relative; background: none; border: none; cursor: pointer; color: var(--qx-muted); font-size: 18px; padding: 4px; }
 .notif-dot { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: var(--qx-red); border-radius: 50%; border: 1.5px solid var(--qx-card); }
 .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--qx-blue); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; cursor: pointer; border: 2px solid var(--qx-border); text-decoration: none; color: var(--qx-text); }
@@ -73,7 +72,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--qx-bg);
 .h-info { flex: 1; }
 .h-name { font-size: 13px; font-weight: 600; }
 .h-meta { font-size: 11px; color: var(--qx-muted); margin-top: 2px; }
-.h-result { text-align: right; }
 .h-pos { font-size: 16px; font-weight: 800; }
 .h-pts { font-size: 11px; color: var(--qx-muted); }
 .pos-1 { color: var(--qx-gold); } .pos-2 { color: #C0C0C0; } .pos-3 { color: #CD7F32; }
@@ -98,15 +96,17 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--qx-bg);
 .tabs { display: flex; border-bottom: 1px solid var(--qx-border); margin-bottom: 1rem; }
 .tab { padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--qx-muted); border-bottom: 2px solid transparent; }
 .tab.active { color: var(--qx-green); border-bottom-color: var(--qx-green); }
+.btn-logout { background: none; border: 1px solid var(--qx-border); color: var(--qx-muted); padding: 5px 12px; border-radius: 7px; font-size: 12px; cursor: pointer; width: 100%; margin-top: 8px; }
+.btn-logout:hover { border-color: var(--qx-red); color: #ff6b6b; }
 </style>
 </head>
 <body>
 <div class="topbar">
   <a href="index.html" class="logo-text">QUINI<span>X</span></a>
   <div class="topbar-right">
-    <span class="plan-badge badge-amateur">Amateur</span>
+    <span class="plan-badge" id="planBadge">Amateur</span>
     <button class="notif-btn">🔔<span class="notif-dot"></span></button>
-    <a href="perfil.html" class="avatar">JR</a>
+    <a href="perfil.html" class="avatar" id="userAvatar">JR</a>
   </div>
 </div>
 
@@ -127,44 +127,36 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--qx-bg);
         <p>Sube a Pro y accede a todas las ligas, 5 quinielas y más.</p>
         <a href="planes.html" class="btn-upgrade">Actualizar plan</a>
       </div>
+      <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
     </div>
   </aside>
 
   <main class="main">
     <div class="greeting">
-      <h2>¡Buenas tardes, José! 👋</h2>
-      <p>Lunes 27 de abril, 2026 · Jornada 16 en curso</p>
+      <h2 id="greetingMsg">¡Bienvenido! 👋</h2>
+      <p id="greetingDate">Cargando...</p>
     </div>
     <div class="stats-strip">
-      <div class="stat-card"><div class="stat-label">Quinielas activas</div><div class="stat-val sv-green">1 <span style="font-size:13px;color:var(--qx-muted);font-weight:400;">/ 1</span></div><div class="stat-sub">Límite Amateur</div></div>
-      <div class="stat-card"><div class="stat-label">Participaciones</div><div class="stat-val sv-blue">8</div><div class="stat-sub">En todas tus quinielas</div></div>
-      <div class="stat-card"><div class="stat-label">Mejor posición</div><div class="stat-val sv-gold">1°</div><div class="stat-sub">Clausura 2026</div></div>
-      <div class="stat-card"><div class="stat-label">Aciertos</div><div class="stat-val sv-green">68%</div><div class="stat-sub">Promedio histórico</div></div>
+      <div class="stat-card"><div class="stat-label">Quinielas activas</div><div class="stat-val sv-green">0 <span style="font-size:13px;color:var(--qx-muted);font-weight:400;">/ 1</span></div><div class="stat-sub">Límite Amateur</div></div>
+      <div class="stat-card"><div class="stat-label">Participaciones</div><div class="stat-val sv-blue">0</div><div class="stat-sub">En todas tus quinielas</div></div>
+      <div class="stat-card"><div class="stat-label">Mejor posición</div><div class="stat-val sv-gold">—</div><div class="stat-sub">Sin quinielas aún</div></div>
+      <div class="stat-card"><div class="stat-label">Aciertos</div><div class="stat-val sv-green">—</div><div class="stat-sub">Promedio histórico</div></div>
     </div>
-    <div class="sec-header"><span class="sec-title">Mis quinielas activas</span><a href="#" class="sec-link">Ver todas</a></div>
+    <div class="sec-header"><span class="sec-title">Mis quinielas activas</span></div>
     <div class="tabs"><div class="tab active">Creadas por mí</div><div class="tab">En las que participo</div></div>
     <div class="quinielas-grid">
-      <a href="participante.html" class="q-card">
-        <div class="q-card-header"><span class="q-league">Liga MX · Clausura 2026</span><span class="q-status">Activa</span></div>
-        <div class="q-name">Quiniela de los Compadres</div>
-        <div class="q-meta"><div class="q-meta-item">👥 7/10</div><div class="q-meta-item">📅 J16</div><div class="q-meta-item">🎯 1X2</div></div>
-        <div class="q-footer"><span class="q-position">Tu posición: <strong>#2</strong> de 7</span><span class="btn-entrar">Entrar</span></div>
-      </a>
       <div class="q-card-locked">
-        <div style="font-size:22px;">🔒</div>
-        <div class="lock-text">Límite de 1 quiniela activa en plan Amateur</div>
-        <a href="planes.html" class="lock-upgrade">Actualizar a Pro →</a>
+        <div style="font-size:22px">🏆</div>
+        <div class="lock-text">Aún no tienes quinielas activas.<br>¡Crea tu primera quiniela!</div>
       </div>
     </div>
     <a href="crear-quiniela.html" class="btn-crear">
       <div class="btn-crear-icon">＋</div>
       <span>Crear nueva quiniela</span>
     </a>
-    <div class="sec-header"><span class="sec-title">Historial reciente</span><a href="#" class="sec-link">Ver todo</a></div>
-    <div class="historial-list">
-      <div class="h-item"><div class="h-icon">🏆</div><div class="h-info"><div class="h-name">Quiniela Apertura 2025</div><div class="h-meta">Liga MX · 8 participantes</div></div><div class="h-result"><div class="h-pos pos-1">1°</div><div class="h-pts">142 pts</div></div></div>
-      <div class="h-item"><div class="h-icon">⚽</div><div class="h-info"><div class="h-name">La Clásica del Trabajo</div><div class="h-meta">Liga MX Femenil · 6 participantes</div></div><div class="h-result"><div class="h-pos pos-2">2°</div><div class="h-pts">118 pts</div></div></div>
-      <div class="h-item"><div class="h-icon">🎯</div><div class="h-info"><div class="h-name">Quiniela Navideña 2024</div><div class="h-meta">Liga MX · 10 participantes</div></div><div class="h-result"><div class="h-pos pos-3">3°</div><div class="h-pts">105 pts</div></div></div>
+    <div class="sec-header"><span class="sec-title">Historial reciente</span></div>
+    <div style="background:var(--qx-card);border:1px solid var(--qx-border);border-radius:10px;padding:1.5rem;text-align:center;color:var(--qx-muted);font-size:13px;">
+      Tu historial aparecerá aquí cuando completes tu primera quiniela.
     </div>
   </main>
 
@@ -177,17 +169,35 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--qx-bg);
         <div class="match-item"><div class="match-league">Liga MX Femenil</div><div class="match-teams"><span class="team-name">Tigres F</span><span class="match-vs">VS</span><span class="team-name right">América F</span></div><div class="match-time">Mañana · 18:00 hrs</div></div>
       </div>
     </div>
-    <div>
-      <div class="rp-title">Ranking · Quiniela de los Compadres</div>
-      <div class="ranking-list">
-        <div class="rank-item"><span class="rank-num rn-1">1</span><div class="rank-avatar">MC</div><span class="rank-name">MikeChampion</span><span class="rank-pts">87 pts</span></div>
-        <div class="rank-item me"><span class="rank-num rn-2">2</span><div class="rank-avatar" style="background:var(--qx-blue)">JR</div><span class="rank-name" style="color:var(--qx-green);font-weight:600">Tú</span><span class="rank-pts">82 pts</span></div>
-        <div class="rank-item"><span class="rank-num rn-3">3</span><div class="rank-avatar">LG</div><span class="rank-name">LuisGol</span><span class="rank-pts">78 pts</span></div>
-        <div class="rank-item"><span class="rank-num" style="color:var(--qx-muted)">4</span><div class="rank-avatar">PA</div><span class="rank-name">PakoAguila</span><span class="rank-pts">71 pts</span></div>
-        <div class="rank-item"><span class="rank-num" style="color:var(--qx-muted)">5</span><div class="rank-avatar">SR</div><span class="rank-name">SandraRey</span><span class="rank-pts">65 pts</span></div>
-      </div>
-    </div>
   </aside>
 </div>
+
+<script>
+// Verificar sesión
+var sessionStr = localStorage.getItem('quinix_session');
+if (!sessionStr) {
+  window.location.href = 'onboarding.html';
+}
+
+var session = JSON.parse(sessionStr || '{}');
+var username = session.username || 'Usuario';
+var initials = username.substring(0,2).toUpperCase();
+
+// Actualizar UI con datos del usuario
+document.getElementById('userAvatar').textContent = initials;
+var now = new Date();
+var hora = now.getHours();
+var saludo = hora < 12 ? 'Buenos días' : hora < 18 ? 'Buenas tardes' : 'Buenas noches';
+document.getElementById('greetingMsg').textContent = saludo + ', ' + username + '! 👋';
+document.getElementById('greetingDate').textContent = now.toLocaleDateString('es-MX', {
+  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+});
+
+function logout() {
+  localStorage.removeItem('quinix_session');
+  localStorage.removeItem('quinix_token');
+  window.location.href = 'index.html';
+}
+</script>
 </body>
 </html>
