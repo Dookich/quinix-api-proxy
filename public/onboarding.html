@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUINIX — Bienvenido</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --qx-green:#1DB954;--qx-green-light:#7ED957;--qx-gold:#F5C518;
+  --qx-red:#D62828;--qx-blue:#1A3FA8;--qx-purple:#8B5CF6;
+  --qx-bg:#0B1529;--qx-card:#132040;--qx-card2:#1A2D55;
+  --qx-text:#F0F4FF;--qx-muted:#8A9FCC;--qx-border:rgba(255,255,255,0.1);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:var(--qx-text);min-height:100vh;display:flex;flex-direction:column;}
+.bg-deco{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+.bg-circle{position:absolute;border-radius:50%;filter:blur(80px);opacity:.12;}
+.bg-c1{width:400px;height:400px;background:var(--qx-blue);top:-100px;right:-100px;}
+.bg-c2{width:300px;height:300px;background:var(--qx-green);bottom:-80px;left:-80px;}
+.bg-c3{width:200px;height:200px;background:var(--qx-purple);top:50%;left:50%;transform:translate(-50%,-50%);}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.5rem;position:relative;z-index:10;}
+.logo{font-size:18px;font-weight:900;letter-spacing:1px;text-decoration:none;color:var(--qx-text);}
+.logo span{color:var(--qx-green-light);}
+.btn-skip{background:none;border:none;color:var(--qx-muted);font-size:13px;font-weight:600;cursor:pointer;padding:6px 12px;border-radius:7px;}
+.btn-skip:hover{color:var(--qx-text);background:rgba(255,255,255,.06);}
+.btn-skip.hidden{visibility:hidden;}
+.progress-wrap{padding:0 1.5rem;position:relative;z-index:10;}
+.progress-steps{display:flex;align-items:center;gap:0;margin-bottom:8px;}
+.step-item{display:flex;align-items:center;flex:1;}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--qx-border);background:var(--qx-card);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--qx-muted);transition:all .3s;flex-shrink:0;z-index:2;}
+.step-dot.done{background:var(--qx-green);border-color:var(--qx-green);color:#0B1529;}
+.step-dot.active{border-color:var(--qx-green);color:var(--qx-green);box-shadow:0 0 0 4px rgba(29,185,84,.15);}
+.step-line{flex:1;height:2px;background:var(--qx-border);transition:background .3s;}
+.step-line.done{background:var(--qx-green);}
+.step-item:last-child .step-line{display:none;}
+.step-labels{display:flex;justify-content:space-between;padding:0 2px;}
+.step-label{font-size:10px;color:var(--qx-muted);font-weight:500;flex:1;text-align:center;}
+.step-label:first-child{text-align:left;}
+.step-label:last-child{text-align:right;}
+.step-label.active{color:var(--qx-green);}
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;position:relative;z-index:10;}
+.step-card{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:20px;padding:2rem;width:100%;max-width:520px;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.welcome-icon{font-size:56px;text-align:center;margin-bottom:1rem;}
+.step-title{font-size:22px;font-weight:900;margin-bottom:.5rem;}
+.step-sub{font-size:14px;color:var(--qx-muted);line-height:1.6;margin-bottom:1.75rem;}
+.step-sub strong{color:var(--qx-text);}
+.form-group{margin-bottom:1.125rem;}
+.form-label{font-size:11px;font-weight:700;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block;}
+.form-input{width:100%;background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:9px;padding:11px 14px;color:var(--qx-text);font-size:14px;outline:none;font-family:inherit;transition:border .2s;}
+.form-input:focus{border-color:var(--qx-green);}
+.form-input::placeholder{color:var(--qx-muted);opacity:.6;}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%238A9FCC'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer;}
+.required-note{font-size:11px;color:var(--qx-muted);margin-top:.5rem;display:flex;align-items:center;gap:5px;}
+.req-dot{width:6px;height:6px;border-radius:50%;background:var(--qx-red);}
+.league-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1.25rem;}
+.league-opt{display:flex;align-items:center;gap:10px;background:var(--qx-bg);border:1.5px solid var(--qx-border);border-radius:10px;padding:.75rem 1rem;cursor:pointer;transition:all .2s;}
+.league-opt:hover:not(.locked){border-color:rgba(29,185,84,.4);}
+.league-opt.selected{border-color:var(--qx-green);background:rgba(29,185,84,.07);}
+.league-opt.locked{opacity:.4;cursor:default;}
+.lo-name{font-size:13px;font-weight:600;}
+.lo-plan{font-size:10px;margin-top:1px;}
+.lo-free{color:var(--qx-green);}.lo-pro{color:var(--qx-gold);}
+.lo-check{font-size:14px;color:var(--qx-green);opacity:0;transition:opacity .15s;margin-left:auto;}
+.league-opt.selected .lo-check{opacity:1;}
+.modo-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem;}
+.modo-opt{display:flex;align-items:center;gap:12px;background:var(--qx-bg);border:1.5px solid var(--qx-border);border-radius:10px;padding:1rem;cursor:pointer;transition:all .2s;}
+.modo-opt:hover{border-color:rgba(29,185,84,.4);}
+.modo-opt.selected{border-color:var(--qx-green);background:rgba(29,185,84,.07);}
+.mo-icon{font-size:24px;flex-shrink:0;}
+.mo-name{font-size:14px;font-weight:700;}
+.mo-desc{font-size:12px;color:var(--qx-muted);margin-top:2px;}
+.mo-pts{font-size:11px;color:var(--qx-green);margin-top:4px;font-weight:600;}
+.mo-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--qx-border);flex-shrink:0;margin-left:auto;transition:all .15s;}
+.modo-opt.selected .mo-radio{border-color:var(--qx-green);background:var(--qx-green);}
+.plan-summary{background:linear-gradient(135deg,rgba(26,63,168,.25),rgba(29,185,84,.12));border:1px solid rgba(29,185,84,.2);border-radius:12px;padding:1.25rem;margin-bottom:1rem;}
+.ps-name{font-size:18px;font-weight:900;margin-bottom:4px;}
+.ps-price{font-size:13px;color:var(--qx-muted);margin-bottom:.875rem;}
+.ps-feat{font-size:12px;color:var(--qx-muted);display:flex;gap:7px;align-items:center;margin-bottom:7px;}
+.ps-feat .ck{color:var(--qx-green);font-weight:700;}
+.upgrade-hint{background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.2);border-radius:10px;padding:.875rem 1rem;display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none;transition:all .2s;}
+.upgrade-hint:hover{background:rgba(245,197,24,.12);}
+.uh-text{flex:1;font-size:12px;color:var(--qx-muted);line-height:1.4;}
+.uh-text strong{color:var(--qx-gold);}
+.finish-wrap{text-align:center;}
+.finish-avatar{width:72px;height:72px;border-radius:50%;background:var(--qx-blue);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;margin:0 auto 1rem;border:3px solid var(--qx-green);}
+.stats-finish{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1.5rem 0;}
+.sf-item{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:.875rem .5rem;text-align:center;}
+.sf-val{font-size:16px;font-weight:800;}
+.sf-lbl{font-size:10px;color:var(--qx-muted);margin-top:2px;line-height:1.3;}
+.btn-primary{width:100%;padding:13px;background:var(--qx-green);color:#0B1529;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:.5rem;text-decoration:none;display:block;text-align:center;}
+.btn-primary:hover{background:var(--qx-green-light);}
+.btn-primary:disabled{opacity:.4;cursor:default;}
+.btn-secondary{width:100%;padding:11px;background:transparent;border:1.5px solid var(--qx-border);color:var(--qx-muted);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:.5rem;text-decoration:none;display:block;text-align:center;}
+.btn-secondary:hover{border-color:var(--qx-text);color:var(--qx-text);}
+</style>
+</head>
+<body>
+<div class="bg-deco">
+  <div class="bg-circle bg-c1"></div>
+  <div class="bg-circle bg-c2"></div>
+  <div class="bg-circle bg-c3"></div>
+</div>
+
+<div class="topbar">
+  <a href="index.html" class="logo">QUINI<span>X</span></a>
+  <button class="btn-skip hidden" id="btnSkip" onclick="skipStep()">Omitir paso →</button>
+</div>
+
+<div class="progress-wrap" id="progressWrap" style="display:none">
+  <div class="progress-steps" id="progressSteps"></div>
+  <div class="step-labels" id="stepLabels"></div>
+</div>
+
+<div class="main">
+  <div class="step-card" id="stepCard"></div>
+</div>
+
+<script>
+var STEPS=[
+  {id:'welcome',label:'Inicio',skippable:false},
+  {id:'perfil',label:'Perfil',skippable:false},
+  {id:'ligas',label:'Ligas',skippable:true},
+  {id:'modo',label:'Modo',skippable:true},
+  {id:'plan',label:'Plan',skippable:true},
+  {id:'listo',label:'¡Listo!',skippable:false},
+];
+var LEAGUES=[
+  {id:'ligamx',name:'Liga MX',emoji:'🇲🇽',free:true},
+  {id:'femenil',name:'Liga MX Femenil',emoji:'⚽',free:true},
+  {id:'premier',name:'Premier League',emoji:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',free:false},
+  {id:'laliga',name:'La Liga',emoji:'🇪🇸',free:false},
+  {id:'bundesliga',name:'Bundesliga',emoji:'🇩🇪',free:false},
+  {id:'seriea',name:'Serie A',emoji:'🇮🇹',free:false},
+  {id:'ucl',name:'Champions League',emoji:'⭐',free:false},
+  {id:'mundial',name:'Mundial 2026',emoji:'🌍',free:false},
+];
+var MODOS=[
+  {id:'1x2',icon:'1️⃣',name:'1X2',desc:'Predice local, empate o visitante',pts:'3 pts por acierto'},
+  {id:'exacto',icon:'🎯',name:'Marcador exacto',desc:'Adivina el marcador final',pts:'5 pts por acierto'},
+  {id:'combo',icon:'💥',name:'Combinado',desc:'1X2 base con pts extra por marcador exacto',pts:'3 pts + 2 pts extra'},
+];
+var state={currentStep:0,username:'',pais:'México',ligas:['ligamx'],modo:'combo'};
+
+function buildProgress(){
+  var dataSteps=STEPS.filter(function(s){return s.id!=='welcome';});
+  var steps=document.getElementById('progressSteps');
+  var labels=document.getElementById('stepLabels');
+  steps.innerHTML='';labels.innerHTML='';
+  dataSteps.forEach(function(s,i){
+    var realIdx=STEPS.findIndex(function(x){return x.id===s.id;});
+    var done=state.currentStep>realIdx,active=state.currentStep===realIdx;
+    var item=document.createElement('div');item.className='step-item';
+    item.innerHTML='<div class="step-dot'+(done?' done':active?' active':'')+'">'+(done?'✓':(i+1))+'</div><div class="step-line'+(done?' done':'')+'"></div>';
+    steps.appendChild(item);
+    var lbl=document.createElement('div');lbl.className='step-label'+(active?' active':'');lbl.textContent=s.label;
+    labels.appendChild(lbl);
+  });
+}
+
+function updateProgress(){
+  var cur=STEPS[state.currentStep];
+  document.getElementById('progressWrap').style.display=state.currentStep===0?'none':'block';
+  document.getElementById('btnSkip').className='btn-skip'+(cur.skippable&&state.currentStep!==STEPS.length-1?'':' hidden');
+  if(state.currentStep>0) buildProgress();
+}
+
+function renderStep(){
+  updateProgress();
+  var card=document.getElementById('stepCard');
+  card.innerHTML='';
+  card.style.animation='none';card.offsetHeight;card.style.animation='fadeIn .3s ease';
+  var id=STEPS[state.currentStep].id;
+  if(id==='welcome') renderWelcome(card);
+  else if(id==='perfil') renderPerfil(card);
+  else if(id==='ligas') renderLigas(card);
+  else if(id==='modo') renderModo(card);
+  else if(id==='plan') renderPlan(card);
+  else if(id==='listo') renderListo(card);
+}
+
+function renderWelcome(card){
+  card.innerHTML='<div class="welcome-icon">⚽</div><div style="text-align:center"><div class="step-title">¡Bienvenido a <span style="color:var(--qx-green-light)">QUINIX</span>!</div><div class="step-sub">La plataforma de quinielas más épica del futbol.<br><br><strong>Solo toma 2 minutos configurar tu cuenta.</strong></div></div>'
+  +'<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:1rem;">'
+  +'<div style="display:flex;align-items:center;gap:12px;background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:.875rem 1rem;"><span style="font-size:22px;">🏆</span><div><div style="font-size:13px;font-weight:600;">Crea quinielas</div><div style="font-size:12px;color:var(--qx-muted);">Personaliza reglas, ligas y modos de predicción</div></div></div>'
+  +'<div style="display:flex;align-items:center;gap:12px;background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:.875rem 1rem;"><span style="font-size:22px;">👥</span><div><div style="font-size:13px;font-weight:600;">Invita a tus amigos</div><div style="font-size:12px;color:var(--qx-muted);">Comparte un link y que empiece la competencia</div></div></div>'
+  +'<div style="display:flex;align-items:center;gap:12px;background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:.875rem 1rem;"><span style="font-size:22px;">📊</span><div><div style="font-size:13px;font-weight:600;">Sigue el marcador</div><div style="font-size:12px;color:var(--qx-muted);">Rankings en tiempo real y estadísticas detalladas</div></div></div>'
+  +'</div><button class="btn-primary" onclick="nextStep()">Comenzar →</button>';
+}
+
+function renderPerfil(card){
+  card.innerHTML='<div class="step-title">Cuéntanos de ti</div><div class="step-sub">Elige cómo quieres que te conozcan los demás jugadores. <strong>Este paso es obligatorio.</strong></div>'
+  +'<div class="form-group"><label class="form-label">Nombre de usuario</label><input class="form-input" id="inputUser" type="text" placeholder="Ej. ElReyDelGol" maxlength="20" value="'+state.username+'" oninput="state.username=this.value;updateNextBtn()"><div class="required-note"><div class="req-dot"></div>Campo obligatorio · Visible para otros jugadores</div></div>'
+  +'<div class="form-group"><label class="form-label">País</label><select class="form-input form-select" onchange="state.pais=this.value"><option>México 🇲🇽</option><option>Estados Unidos 🇺🇸</option><option>Colombia 🇨🇴</option><option>Argentina 🇦🇷</option><option>España 🇪🇸</option><option>Otro</option></select></div>'
+  +'<button class="btn-primary" id="btnNextPerfil" onclick="nextStep()" '+(state.username.trim()===''?'disabled':'')+'>Continuar →</button>';
+}
+
+function updateNextBtn(){var btn=document.getElementById('btnNextPerfil');if(btn)btn.disabled=state.username.trim()==='';}
+
+function renderLigas(card){
+  var html='<div class="step-title">¿Cuáles son tus ligas favoritas?</div><div class="step-sub">Las ligas europeas se desbloquean con el plan Pro.</div><div class="league-grid">';
+  LEAGUES.forEach(function(l){
+    var sel=state.ligas.indexOf(l.id)>=0;
+    html+='<div class="league-opt'+(sel?' selected':'')+(l.free?'':' locked')+'" id="lo-'+l.id+'" onclick="'+(l.free?'toggleLeague(\''+l.id+'\')':'')+'"><div style="font-size:20px">'+l.emoji+'</div><div><div class="lo-name">'+l.name+'</div><div class="lo-plan '+(l.free?'lo-free':'lo-pro')+'">'+(l.free?'Amateur':'Pro 🔒')+'</div></div><div class="lo-check">✓</div></div>';
+  });
+  html+='</div><button class="btn-primary" onclick="nextStep()">Continuar →</button><button class="btn-secondary" onclick="nextStep()">Omitir este paso</button>';
+  card.innerHTML=html;
+}
+
+function toggleLeague(id){
+  var idx=state.ligas.indexOf(id);
+  if(idx>=0) state.ligas.splice(idx,1); else state.ligas.push(id);
+  var el=document.getElementById('lo-'+id);
+  if(el) el.classList.toggle('selected',state.ligas.indexOf(id)>=0);
+}
+
+function renderModo(card){
+  var html='<div class="step-title">¿Cómo prefieres jugar?</div><div class="step-sub">Elige el modo de predicción que más te gusta. Podrás cambiarlo al crear cada quiniela.</div><div class="modo-grid">';
+  MODOS.forEach(function(m){
+    var sel=state.modo===m.id;
+    html+='<div class="modo-opt'+(sel?' selected':'')+'" onclick="selectModo(\''+m.id+'\')"><div class="mo-icon">'+m.icon+'</div><div style="flex:1"><div class="mo-name">'+m.name+'</div><div class="mo-desc">'+m.desc+'</div><div class="mo-pts">'+m.pts+'</div></div><div class="mo-radio"></div></div>';
+  });
+  html+='</div><button class="btn-primary" onclick="nextStep()">Continuar →</button><button class="btn-secondary" onclick="nextStep()">Omitir este paso</button>';
+  card.innerHTML=html;
+}
+
+function selectModo(id){
+  state.modo=id;
+  document.querySelectorAll('.modo-opt').forEach(function(el){el.classList.remove('selected');});
+  document.querySelectorAll('.modo-opt').forEach(function(el){
+    if(el.onclick&&el.getAttribute('onclick')&&el.getAttribute('onclick').indexOf("'"+id+"'")>=0) el.classList.add('selected');
+  });
+}
+
+function renderPlan(card){
+  card.innerHTML='<div class="step-title">Tu plan de inicio</div><div class="step-sub">Comienzas con el plan Amateur de forma gratuita.</div>'
+  +'<div class="plan-summary"><div class="ps-name">Plan Amateur</div><div class="ps-price">Siempre gratis</div>'
+  +'<div class="ps-feat"><span class="ck">✓</span>1 quiniela activa</div>'
+  +'<div class="ps-feat"><span class="ck">✓</span>Liga MX y Liga MX Femenil</div>'
+  +'<div class="ps-feat"><span class="ck">✓</span>Hasta 10 participantes</div>'
+  +'<div class="ps-feat"><span class="ck">✓</span>Predicción 1X2</div></div>'
+  +'<a href="planes.html" class="upgrade-hint"><div style="font-size:20px">⭐</div><div class="uh-text">¿Quieres más? Con <strong>Pro desde $99 MXN/mes</strong> desbloqueas todas las ligas, 5 quinielas y más.</div><div style="font-size:14px;color:var(--qx-gold)">›</div></a>'
+  +'<button class="btn-primary" onclick="nextStep()" style="margin-top:1rem;">Continuar con Amateur →</button>'
+  +'<a href="planes.html" class="btn-secondary" style="margin-top:.5rem;text-align:center;color:var(--qx-gold);border-color:rgba(245,197,24,.3);">Ver planes Pro y Elite</a>';
+}
+
+function renderListo(card){
+  var initials=state.username?state.username.substring(0,2).toUpperCase():'JR';
+  var modoObj=MODOS.find(function(m){return m.id===state.modo;});
+  card.innerHTML='<div class="finish-wrap"><div style="font-size:32px;margin-bottom:.75rem;">🎉</div>'
+  +'<div class="finish-avatar">'+initials+'</div>'
+  +'<div class="step-title">¡Todo listo, '+(state.username||'campeón')+'!</div>'
+  +'<div class="step-sub">Tu cuenta está configurada. ¡Crea tu primera quiniela y demuestra que eres el mejor pronosticador!</div>'
+  +'<div class="stats-finish">'
+  +'<div class="sf-item"><div class="sf-val" style="color:var(--qx-green)">Amateur</div><div class="sf-lbl">Tu plan</div></div>'
+  +'<div class="sf-item"><div class="sf-val" style="color:var(--qx-gold)">'+state.ligas.length+'</div><div class="sf-lbl">Liga'+(state.ligas.length!==1?'s favoritas':' favorita')+'</div></div>'
+  +'<div class="sf-item"><div class="sf-val" style="color:var(--qx-purple)">'+(modoObj?modoObj.icon:'💥')+'</div><div class="sf-lbl">Modo '+(modoObj?modoObj.name:'Combinado')+'</div></div>'
+  +'</div>'
+  +'<a href="crear-quiniela.html" class="btn-primary">🏆 Crear mi primera quiniela</a>'
+  +'<a href="dashboard.html" class="btn-secondary">Ir al dashboard</a></div>';
+}
+
+function nextStep(){if(state.currentStep<STEPS.length-1){state.currentStep++;renderStep();}}
+function skipStep(){var cur=STEPS[state.currentStep];if(cur.skippable) nextStep();}
+
+renderStep();
+</script>
+</body>
+</html>
