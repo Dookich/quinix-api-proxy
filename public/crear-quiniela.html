@@ -96,8 +96,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
 .res-label{font-size:10px;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:4px;}
 .res-val{font-size:13px;font-weight:700;}
 .res-val.green{color:var(--qx-green);}.res-val.gold{color:var(--qx-gold);}
-.bomba-resumen{background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.2);border-radius:10px;padding:.875rem;margin-bottom:1.25rem;}
-.br-title{font-size:12px;font-weight:700;color:var(--qx-gold);margin-bottom:6px;}
 .info-box{background:rgba(26,63,168,.2);border:1px solid rgba(26,63,168,.4);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--qx-muted);line-height:1.5;margin-top:1rem;}
 .info-box strong{color:var(--qx-text);}
 .divider-label{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:1.5rem 0 1rem;}
@@ -145,7 +143,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
       </div>
       <div class="form-group">
         <label class="form-label">Descripción <span class="badge-optional">Opcional</span></label>
-        <textarea class="form-input form-textarea" maxlength="150" placeholder="Ej. El último lugar paga las cervezas 🍺"></textarea>
+        <textarea class="form-input form-textarea" id="qDesc" maxlength="150" placeholder="Ej. El último lugar paga las cervezas 🍺"></textarea>
       </div>
       <div class="form-group">
         <label class="form-label">Color de portada</label>
@@ -156,7 +154,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
 
     <div id="step2" style="display:none">
       <div class="card-title">Elige el torneo</div>
-      <div class="card-sub">Plan Amateur incluye Liga MX y Liga MX Femenil. Actualiza para desbloquear más torneos.</div>
+      <div class="card-sub">Plan Amateur incluye Liga MX y Liga MX Femenil.</div>
       <div class="leagues-grid" id="leaguesGrid"></div>
       <div class="info-box">🔒 Las ligas bloqueadas requieren plan <strong>Pro</strong> o <strong>Elite</strong>. <a href="planes.html" style="color:var(--qx-green);font-weight:600;">Actualizar plan →</a></div>
       <div class="nav-btns">
@@ -167,18 +165,18 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
 
     <div id="step3" style="display:none">
       <div class="card-title">Alcance de la quiniela</div>
-      <div class="card-sub" id="alcanceSub">Con el plan Amateur tu quiniela abarca el torneo completo automáticamente.</div>
+      <div class="card-sub">Con el plan Amateur tu quiniela abarca el torneo completo.</div>
       <div class="alcance-grid" id="alcanceGrid"></div>
-      <div class="info-box" id="alcanceInfo">ℹ️ Plan <strong>Amateur</strong> incluye siempre el torneo completo. <a href="planes.html" style="color:var(--qx-green);font-weight:600;">Actualiza a Pro</a> para elegir jornadas o partidos específicos.</div>
+      <div class="info-box">ℹ️ Plan <strong>Amateur</strong> incluye siempre el torneo completo. <a href="planes.html" style="color:var(--qx-green);font-weight:600;">Actualiza a Pro</a> para más opciones.</div>
       <div class="nav-btns">
         <button class="btn-prev" onclick="goBack()">← Anterior</button>
-        <button class="btn-next" id="btnNext3" onclick="goNext(3)">Siguiente →</button>
+        <button class="btn-next" onclick="goNext(3)">Siguiente →</button>
       </div>
     </div>
 
     <div id="step4" style="display:none">
       <div class="card-title">Reglas y puntuación</div>
-      <div class="card-sub">Configura cómo se ganan los puntos en tu quiniela.</div>
+      <div class="card-sub">Configura cómo se ganan los puntos.</div>
       <div class="form-group">
         <div class="form-label">Modo de predicción</div>
         <div class="modo-grid" id="modoGrid"></div>
@@ -203,7 +201,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
         <label class="form-label">💣 Puntos Bomba <span class="badge-pro">Pro / Elite</span></label>
         <div style="background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:9px;padding:.875rem 1rem;opacity:.45;">
           <div style="font-size:13px;font-weight:600;color:var(--qx-muted);margin-bottom:4px;">Disponible en planes Pro y Elite</div>
-          <div style="font-size:12px;color:var(--qx-muted);">Activa partidos bomba con puntos extra por jornada. La asignación se configura jornada por jornada.</div>
+          <div style="font-size:12px;color:var(--qx-muted);">Activa partidos bomba con puntos extra por jornada.</div>
         </div>
       </div>
       <div class="nav-btns">
@@ -214,12 +212,12 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
 
     <div id="step5" style="display:none">
       <div class="card-title">Participantes y cierre</div>
-      <div class="card-sub">Configura quién puede entrar y cuándo se cierran las predicciones.</div>
+      <div class="card-sub">Configura quién puede entrar y cuándo cierran las predicciones.</div>
       <div class="form-group">
         <div class="form-label">Privacidad</div>
         <div class="radio-group">
           <div class="radio-opt selected" id="priv1" onclick="sel('priv',1,2)"><div class="radio-dot"></div><div><div class="radio-text">🔗 Solo por invitación (link)</div><div class="radio-sub">Solo quienes tengan el link pueden unirse.</div></div></div>
-          <div class="radio-opt" id="priv2" onclick="sel('priv',2,2)"><div class="radio-dot"></div><div><div class="radio-text">🌐 Pública</div><div class="radio-sub">Cualquier usuario de QUINIX puede encontrarla.</div></div></div>
+          <div class="radio-opt" id="priv2" onclick="sel('priv',2,2)"><div class="radio-dot"></div><div><div class="radio-text">🌐 Pública</div><div class="radio-sub">Cualquier usuario puede encontrarla.</div></div></div>
         </div>
       </div>
       <div class="form-group">
@@ -229,14 +227,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
           <div class="radio-opt" id="cierre2" onclick="sel('cierre',2,2);document.getElementById('cierreCustom').style.display='block'"><div class="radio-dot"></div><div><div class="radio-text">🕐 Con anticipación personalizada</div><div class="radio-sub">Elige cuántos minutos antes del partido se cierra.</div></div></div>
         </div>
         <div id="cierreCustom" style="display:none;margin-top:10px;">
-          <select class="form-input form-select">
+          <select class="form-input form-select" id="cierreMinutos">
             <option>5 minutos antes</option><option>10 minutos antes</option><option selected>15 minutos antes</option><option>30 minutos antes</option><option>60 minutos antes</option>
           </select>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Aviso por email antes del cierre</label>
-        <select class="form-input form-select">
+        <label class="form-label">Aviso por email</label>
+        <select class="form-input form-select" id="avisoEmail">
           <option>Sin aviso</option><option>15 minutos antes</option><option selected>30 minutos antes</option><option>60 minutos antes</option><option>120 minutos antes</option>
         </select>
       </div>
@@ -256,7 +254,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
           <div style="font-size:12px;color:var(--qx-muted);">MXN × participantes =</div>
           <div class="monto-total">Pozo: <strong id="montoTotal">$0</strong></div>
         </div>
-        <div style="font-size:11px;color:var(--qx-muted);margin-top:8px;">El cobro es externo a QUINIX. La app solo muestra el total.</div>
       </div>
       <div class="nav-btns">
         <button class="btn-prev" onclick="goBack()">← Anterior</button>
@@ -268,8 +265,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
       <div class="card-title">Resumen de tu quiniela</div>
       <div class="card-sub">Revisa todo antes de publicar.</div>
       <div class="resumen-grid" id="resumenGrid"></div>
-      <div class="bomba-resumen" id="bombaResumen" style="display:none"></div>
-      <div class="info-box">✅ Tu quiniela quedará <strong>activa de inmediato</strong>. Los participantes podrán predecir conforme se acerquen los partidos.</div>
+      <div class="info-box">✅ Tu quiniela quedará <strong>activa de inmediato</strong>.</div>
       <div class="nav-btns">
         <button class="btn-prev" onclick="goBack()">← Editar</button>
         <button class="btn-publish" onclick="publicar()">🏆 Publicar quiniela</button>
@@ -281,9 +277,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
     <div class="success-icon">🎉</div>
     <div class="success-title">¡Quiniela creada!</div>
     <div class="success-sub">Comparte el link con tus amigos para que se unan.</div>
-    <div class="link-box"><span id="shareLink">quinix.app/q/mi-quiniela-2026</span><button class="btn-copy" onclick="copyLink()">Copiar</button></div>
+    <div class="link-box"><span id="shareLink">quinix.app/q/mi-quiniela</span><button class="btn-copy" onclick="copyLink()">Copiar</button></div>
     <div class="success-btns">
-      <a href="participante.html" class="sbtn sbtn-green">Ver mi quiniela</a>
+      <a href="dashboard.html" class="sbtn sbtn-green">Ver mis quinielas</a>
       <a href="dashboard.html" class="sbtn sbtn-outline">Ir al dashboard</a>
     </div>
   </div>
@@ -293,16 +289,16 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
 var COLORS=['#1A3FA8','#1DB954','#D62828','#F5C518','#8B5CF6','#F97316','#06B6D4','#EC4899'];
 var STEP_LABELS=['Info','Torneo','Alcance','Reglas','Participantes','Resumen'];
 var LEAGUES=[
-  {id:'ligamx',name:'Liga MX',emoji:'🇲🇽',plan:'Amateur',free:true},
-  {id:'femenil',name:'Liga MX Femenil',emoji:'⚽',plan:'Amateur',free:true},
-  {id:'premier',name:'Premier League',emoji:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',plan:'Pro',free:false},
-  {id:'laliga',name:'La Liga',emoji:'🇪🇸',plan:'Pro',free:false},
-  {id:'bundesliga',name:'Bundesliga',emoji:'🇩🇪',plan:'Pro',free:false},
-  {id:'seriea',name:'Serie A',emoji:'🇮🇹',plan:'Pro',free:false},
-  {id:'ligue1',name:'Ligue 1',emoji:'🇫🇷',plan:'Pro',free:false},
-  {id:'eredivisie',name:'Eredivisie',emoji:'🇳🇱',plan:'Pro',free:false},
-  {id:'ucl',name:'Champions League',emoji:'⭐',plan:'Pro',free:false},
-  {id:'mundial',name:'Mundial FIFA 2026',emoji:'🌍',plan:'Pro',free:false},
+  {id:'ligamx',name:'Liga MX',emoji:'🇲🇽',plan:'Amateur',free:true,liga_id:262},
+  {id:'femenil',name:'Liga MX Femenil',emoji:'⚽',plan:'Amateur',free:true,liga_id:263},
+  {id:'premier',name:'Premier League',emoji:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',plan:'Pro',free:false,liga_id:39},
+  {id:'laliga',name:'La Liga',emoji:'🇪🇸',plan:'Pro',free:false,liga_id:140},
+  {id:'bundesliga',name:'Bundesliga',emoji:'🇩🇪',plan:'Pro',free:false,liga_id:78},
+  {id:'seriea',name:'Serie A',emoji:'🇮🇹',plan:'Pro',free:false,liga_id:135},
+  {id:'ligue1',name:'Ligue 1',emoji:'🇫🇷',plan:'Pro',free:false,liga_id:61},
+  {id:'eredivisie',name:'Eredivisie',emoji:'🇳🇱',plan:'Pro',free:false,liga_id:88},
+  {id:'ucl',name:'Champions League',emoji:'⭐',plan:'Pro',free:false,liga_id:2},
+  {id:'mundial',name:'Mundial FIFA 2026',emoji:'🌍',plan:'Pro',free:false,liga_id:1},
 ];
 var MODOS=[
   {id:'1x2',icon:'1️⃣',name:'1X2',desc:'Local, empate o visitante'},
@@ -310,6 +306,12 @@ var MODOS=[
   {id:'combo',icon:'💥',name:'Combinado',desc:'1X2 base + pts extra por marcador exacto'},
 ];
 var S={step:1,color:COLORS[0],liga:null,alcance:'completo',modo:'combo'};
+
+// Verificar sesión
+var session = JSON.parse(localStorage.getItem('quinix_session') || '{}');
+if(!localStorage.getItem('quinix_token')){
+  window.location.href = 'login.html';
+}
 
 function init(){
   var cr=document.getElementById('colorRow');
@@ -356,9 +358,7 @@ function buildModos(){
 }
 
 function sel(prefix,n,total){for(var i=1;i<=total;i++)document.getElementById(prefix+i).classList.toggle('selected',i===n);}
-
-function selPremio(n){[1,2,3].forEach(function(i){document.getElementById('premio'+i).classList.toggle('selected',i===n);});document.getElementById('montoConfig').style.display='block';}
-
+function selPremio(n){[1,2,3].forEach(function(i){document.getElementById('premio'+i).classList.toggle('selected',i===n);});}
 function calcMonto(){var m=parseFloat(document.getElementById('montoInput').value)||0;document.getElementById('montoTotal').textContent='$'+(m*10).toLocaleString('es-MX')+' MXN';}
 
 function buildResumen(){
@@ -384,10 +384,50 @@ function buildResumen(){
 }
 
 function publicar(){
-  document.getElementById('mainCard').style.display='none';
-  var n=document.getElementById('qNombre').value.replace(/\s+/g,'-').toLowerCase()||'mi-quiniela';
-  document.getElementById('shareLink').textContent='quinix.app/q/'+n+'-2026';
-  document.getElementById('successScreen').style.display='block';
+  var token=localStorage.getItem('quinix_token');
+  var session=JSON.parse(localStorage.getItem('quinix_session')||'{}');
+  if(!token){window.location.href='login.html';return;}
+
+  var liga=LEAGUES.find(function(l){return l.id===S.liga;});
+  var quiniela={
+    nombre:document.getElementById('qNombre').value||'Mi quiniela',
+    descripcion:document.getElementById('qDesc').value||'',
+    color:S.color,
+    liga_id:liga?liga.liga_id:262,
+    liga_nombre:liga?liga.name:'Liga MX',
+    modo:S.modo,
+    pts_acierto:parseInt(document.getElementById('ptsAcierto').value)||3,
+    pts_exacto:parseInt(document.getElementById('ptsExacto').value)||2,
+    bomba_activo:false,
+    cierre_tipo:'inicio',
+    premio_tipo:1,
+    monto_participante:parseFloat(document.getElementById('montoInput').value)||0,
+    privacidad:'link'
+  };
+
+  document.getElementById('mainCard').innerHTML='<div style="text-align:center;padding:3rem"><div style="font-size:40px;margin-bottom:1rem">⏳</div><div style="font-size:16px;font-weight:700;color:var(--qx-text)">Creando tu quiniela...</div></div>';
+
+  fetch('https://quinix-api-proxy.vercel.app/api/quinielas',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify({action:'crear',quiniela:quiniela,user_id:session.id})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.error){
+      alert('Error: '+data.error);
+      window.location.reload();
+      return;
+    }
+    document.getElementById('mainCard').style.display='none';
+    var n=quiniela.nombre.replace(/\s+/g,'-').toLowerCase();
+    document.getElementById('shareLink').textContent='quinix.app/q/'+n+'-'+(data.id?data.id.substring(0,6):'nueva');
+    document.getElementById('successScreen').style.display='block';
+  })
+  .catch(function(e){
+    alert('Error de conexión: '+e.message);
+    window.location.reload();
+  });
 }
 
 function copyLink(){navigator.clipboard.writeText(document.getElementById('shareLink').textContent).then(function(){document.querySelector('.btn-copy').textContent='¡Copiado!';setTimeout(function(){document.querySelector('.btn-copy').textContent='Copiar';},2000);});}
