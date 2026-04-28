@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUINIX — Dashboard</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --qx-blue: #1A3FA8; --qx-green: #1DB954; --qx-green-light: #7ED957;
+  --qx-red: #D62828; --qx-gold: #F5C518;
+  --qx-bg: #0B1529; --qx-card: #132040; --qx-card2: #1A2D55;
+  --qx-text: #F0F4FF; --qx-muted: #8A9FCC; --qx-border: rgba(255,255,255,0.1);
+}
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--qx-bg); color: var(--qx-text); min-height: 100vh; display: flex; flex-direction: column; }
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--qx-border); background: var(--qx-card); position: sticky; top: 0; z-index: 10; }
+.logo-text { font-size: 18px; font-weight: 900; letter-spacing: 1px; text-decoration: none; color: var(--qx-text); }
+.logo-text span { color: var(--qx-green-light); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.plan-badge { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 20px; }
+.badge-amateur { background: rgba(255,255,255,0.08); color: var(--qx-muted); border: 1px solid var(--qx-border); }
+.notif-btn { position: relative; background: none; border: none; cursor: pointer; color: var(--qx-muted); font-size: 18px; padding: 4px; }
+.notif-dot { position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; background: var(--qx-red); border-radius: 50%; border: 1.5px solid var(--qx-card); }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--qx-blue); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; cursor: pointer; border: 2px solid var(--qx-border); text-decoration: none; color: var(--qx-text); }
+.layout { display: grid; grid-template-columns: 220px 1fr 260px; gap: 0; flex: 1; }
+.sidebar { border-right: 1px solid var(--qx-border); padding: 1.25rem 0; display: flex; flex-direction: column; gap: 2px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 1.25rem; font-size: 13px; font-weight: 500; color: var(--qx-muted); cursor: pointer; border-left: 3px solid transparent; transition: all .15s; text-decoration: none; }
+.nav-item:hover { color: var(--qx-text); background: rgba(255,255,255,.04); }
+.nav-item.active { color: var(--qx-green); border-left-color: var(--qx-green); background: rgba(29,185,84,.07); }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.nav-section { font-size: 10px; font-weight: 700; color: var(--qx-muted); text-transform: uppercase; letter-spacing: 1px; padding: 14px 1.25rem 4px; opacity: 0.5; }
+.sidebar-footer { margin-top: auto; padding: 1rem 1.25rem; border-top: 1px solid var(--qx-border); }
+.upgrade-card { background: linear-gradient(135deg, rgba(26,63,168,.4), rgba(29,185,84,.2)); border: 1px solid rgba(29,185,84,.25); border-radius: 10px; padding: 0.875rem; }
+.upgrade-card p { font-size: 11px; color: var(--qx-muted); margin-bottom: 8px; line-height: 1.4; }
+.upgrade-card strong { color: var(--qx-text); display: block; font-size: 12px; margin-bottom: 4px; }
+.btn-upgrade { width: 100%; padding: 7px; background: var(--qx-green); color: #0B1529; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; display: block; text-align: center; }
+.btn-upgrade:hover { background: var(--qx-green-light); }
+.main { padding: 1.5rem; overflow-y: auto; }
+.greeting { margin-bottom: 1.5rem; }
+.greeting h2 { font-size: 20px; font-weight: 800; }
+.greeting p { font-size: 13px; color: var(--qx-muted); margin-top: 2px; }
+.stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.stat-card { background: var(--qx-card); border: 1px solid var(--qx-border); border-radius: 10px; padding: 0.875rem 1rem; }
+.stat-label { font-size: 11px; color: var(--qx-muted); margin-bottom: 4px; }
+.stat-val { font-size: 22px; font-weight: 800; }
+.stat-sub { font-size: 11px; color: var(--qx-muted); margin-top: 2px; }
+.sv-green { color: var(--qx-green); } .sv-gold { color: var(--qx-gold); } .sv-blue { color: #6EB5FF; }
+.sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.sec-title { font-size: 15px; font-weight: 700; }
+.sec-link { font-size: 12px; color: var(--qx-green); cursor: pointer; text-decoration: none; }
+.quinielas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 2rem; }
+.q-card { background: var(--qx-card); border: 1px solid var(--qx-border); border-radius: 12px; padding: 1rem; cursor: pointer; transition: border-color .2s, transform .15s; text-decoration: none; color: var(--qx-text); display: block; }
+.q-card:hover { border-color: rgba(29,185,84,.4); transform: translateY(-1px); }
+.q-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.q-league { font-size: 10px; font-weight: 700; color: var(--qx-muted); text-transform: uppercase; letter-spacing: .5px; }
+.q-status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; background: rgba(29,185,84,.15); color: var(--qx-green); }
+.q-name { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+.q-meta { display: flex; gap: 14px; }
+.q-meta-item { font-size: 11px; color: var(--qx-muted); }
+.q-footer { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--qx-border); display: flex; align-items: center; justify-content: space-between; }
+.q-position { font-size: 12px; color: var(--qx-muted); }
+.q-position strong { color: var(--qx-text); }
+.btn-entrar { padding: 5px 14px; background: var(--qx-green); color: #0B1529; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; }
+.q-card-locked { background: var(--qx-card); border: 1px dashed rgba(255,255,255,.1); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 130px; opacity: .6; }
+.lock-text { font-size: 12px; color: var(--qx-muted); text-align: center; }
+.lock-upgrade { font-size: 11px; color: var(--qx-green); cursor: pointer; font-weight: 600; text-decoration: none; }
+.btn-crear { display: flex; align-items: center; gap: 10px; background: var(--qx-card2); border: 1.5px dashed rgba(29,185,84,.35); border-radius: 12px; padding: 1rem; cursor: pointer; color: var(--qx-green); font-size: 14px; font-weight: 600; transition: all .2s; text-decoration: none; margin-bottom: 2rem; }
+.btn-crear:hover { border-color: var(--qx-green); background: rgba(29,185,84,.08); }
+.btn-crear-icon { width: 36px; height: 36px; background: rgba(29,185,84,.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.historial-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 2rem; }
+.h-item { background: var(--qx-card); border: 1px solid var(--qx-border); border-radius: 10px; padding: .875rem 1rem; display: flex; align-items: center; gap: 12px; }
+.h-icon { width: 36px; height: 36px; background: var(--qx-card2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.h-info { flex: 1; }
+.h-name { font-size: 13px; font-weight: 600; }
+.h-meta { font-size: 11px; color: var(--qx-muted); margin-top: 2px; }
+.h-result { text-align: right; }
+.h-pos { font-size: 16px; font-weight: 800; }
+.h-pts { font-size: 11px; color: var(--qx-muted); }
+.pos-1 { color: var(--qx-gold); } .pos-2 { color: #C0C0C0; } .pos-3 { color: #CD7F32; }
+.right-panel { border-left: 1px solid var(--qx-border); padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 1.5rem; overflow-y: auto; }
+.rp-title { font-size: 13px; font-weight: 700; margin-bottom: .75rem; }
+.match-list { display: flex; flex-direction: column; gap: 8px; }
+.match-item { background: var(--qx-card); border: 1px solid var(--qx-border); border-radius: 10px; padding: .75rem; }
+.match-league { font-size: 10px; color: var(--qx-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 6px; }
+.match-teams { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.team-name { font-size: 12px; font-weight: 600; flex: 1; }
+.team-name.right { text-align: right; }
+.match-vs { font-size: 10px; color: var(--qx-muted); font-weight: 700; padding: 2px 6px; background: var(--qx-card2); border-radius: 4px; }
+.match-time { font-size: 10px; color: var(--qx-muted); margin-top: 5px; text-align: center; }
+.ranking-list { display: flex; flex-direction: column; gap: 6px; }
+.rank-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; }
+.rank-item.me { background: rgba(29,185,84,.08); border: 1px solid rgba(29,185,84,.2); }
+.rank-num { font-size: 12px; font-weight: 800; width: 18px; text-align: center; }
+.rn-1 { color: var(--qx-gold); } .rn-2 { color: #C0C0C0; } .rn-3 { color: #CD7F32; }
+.rank-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--qx-card2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+.rank-name { font-size: 12px; flex: 1; }
+.rank-pts { font-size: 12px; font-weight: 700; color: var(--qx-green); }
+.tabs { display: flex; border-bottom: 1px solid var(--qx-border); margin-bottom: 1rem; }
+.tab { padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--qx-muted); border-bottom: 2px solid transparent; }
+.tab.active { color: var(--qx-green); border-bottom-color: var(--qx-green); }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html" class="logo-text">QUINI<span>X</span></a>
+  <div class="topbar-right">
+    <span class="plan-badge badge-amateur">Amateur</span>
+    <button class="notif-btn">🔔<span class="notif-dot"></span></button>
+    <a href="perfil.html" class="avatar">JR</a>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-section">Principal</div>
+    <a href="dashboard.html" class="nav-item active"><span class="nav-icon">🏠</span>Inicio</a>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏆</span>Mis quinielas</a>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📋</span>Historial</a>
+    <div class="nav-section">Explorar</div>
+    <a href="estadisticas.html" class="nav-item"><span class="nav-icon">📊</span>Estadísticas</a>
+    <div class="nav-section">Cuenta</div>
+    <a href="perfil.html" class="nav-item"><span class="nav-icon">👤</span>Mi perfil</a>
+    <a href="planes.html" class="nav-item"><span class="nav-icon">⭐</span>Planes y add-ons</a>
+    <div class="sidebar-footer">
+      <div class="upgrade-card">
+        <strong>Estás en Amateur</strong>
+        <p>Sube a Pro y accede a todas las ligas, 5 quinielas y más.</p>
+        <a href="planes.html" class="btn-upgrade">Actualizar plan</a>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="greeting">
+      <h2>¡Buenas tardes, José! 👋</h2>
+      <p>Lunes 27 de abril, 2026 · Jornada 16 en curso</p>
+    </div>
+    <div class="stats-strip">
+      <div class="stat-card"><div class="stat-label">Quinielas activas</div><div class="stat-val sv-green">1 <span style="font-size:13px;color:var(--qx-muted);font-weight:400;">/ 1</span></div><div class="stat-sub">Límite Amateur</div></div>
+      <div class="stat-card"><div class="stat-label">Participaciones</div><div class="stat-val sv-blue">8</div><div class="stat-sub">En todas tus quinielas</div></div>
+      <div class="stat-card"><div class="stat-label">Mejor posición</div><div class="stat-val sv-gold">1°</div><div class="stat-sub">Clausura 2026</div></div>
+      <div class="stat-card"><div class="stat-label">Aciertos</div><div class="stat-val sv-green">68%</div><div class="stat-sub">Promedio histórico</div></div>
+    </div>
+    <div class="sec-header"><span class="sec-title">Mis quinielas activas</span><a href="#" class="sec-link">Ver todas</a></div>
+    <div class="tabs"><div class="tab active">Creadas por mí</div><div class="tab">En las que participo</div></div>
+    <div class="quinielas-grid">
+      <a href="participante.html" class="q-card">
+        <div class="q-card-header"><span class="q-league">Liga MX · Clausura 2026</span><span class="q-status">Activa</span></div>
+        <div class="q-name">Quiniela de los Compadres</div>
+        <div class="q-meta"><div class="q-meta-item">👥 7/10</div><div class="q-meta-item">📅 J16</div><div class="q-meta-item">🎯 1X2</div></div>
+        <div class="q-footer"><span class="q-position">Tu posición: <strong>#2</strong> de 7</span><span class="btn-entrar">Entrar</span></div>
+      </a>
+      <div class="q-card-locked">
+        <div style="font-size:22px;">🔒</div>
+        <div class="lock-text">Límite de 1 quiniela activa en plan Amateur</div>
+        <a href="planes.html" class="lock-upgrade">Actualizar a Pro →</a>
+      </div>
+    </div>
+    <a href="crear-quiniela.html" class="btn-crear">
+      <div class="btn-crear-icon">＋</div>
+      <span>Crear nueva quiniela</span>
+    </a>
+    <div class="sec-header"><span class="sec-title">Historial reciente</span><a href="#" class="sec-link">Ver todo</a></div>
+    <div class="historial-list">
+      <div class="h-item"><div class="h-icon">🏆</div><div class="h-info"><div class="h-name">Quiniela Apertura 2025</div><div class="h-meta">Liga MX · 8 participantes</div></div><div class="h-result"><div class="h-pos pos-1">1°</div><div class="h-pts">142 pts</div></div></div>
+      <div class="h-item"><div class="h-icon">⚽</div><div class="h-info"><div class="h-name">La Clásica del Trabajo</div><div class="h-meta">Liga MX Femenil · 6 participantes</div></div><div class="h-result"><div class="h-pos pos-2">2°</div><div class="h-pts">118 pts</div></div></div>
+      <div class="h-item"><div class="h-icon">🎯</div><div class="h-info"><div class="h-name">Quiniela Navideña 2024</div><div class="h-meta">Liga MX · 10 participantes</div></div><div class="h-result"><div class="h-pos pos-3">3°</div><div class="h-pts">105 pts</div></div></div>
+    </div>
+  </main>
+
+  <aside class="right-panel">
+    <div>
+      <div class="rp-title">Próximos partidos · J16</div>
+      <div class="match-list">
+        <div class="match-item"><div class="match-league">Liga MX</div><div class="match-teams"><span class="team-name">América</span><span class="match-vs">VS</span><span class="team-name right">Chivas</span></div><div class="match-time">Hoy · 20:00 hrs</div></div>
+        <div class="match-item"><div class="match-league">Liga MX</div><div class="match-teams"><span class="team-name">Cruz Azul</span><span class="match-vs">VS</span><span class="team-name right">Pumas</span></div><div class="match-time">Hoy · 22:00 hrs</div></div>
+        <div class="match-item"><div class="match-league">Liga MX Femenil</div><div class="match-teams"><span class="team-name">Tigres F</span><span class="match-vs">VS</span><span class="team-name right">América F</span></div><div class="match-time">Mañana · 18:00 hrs</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="rp-title">Ranking · Quiniela de los Compadres</div>
+      <div class="ranking-list">
+        <div class="rank-item"><span class="rank-num rn-1">1</span><div class="rank-avatar">MC</div><span class="rank-name">MikeChampion</span><span class="rank-pts">87 pts</span></div>
+        <div class="rank-item me"><span class="rank-num rn-2">2</span><div class="rank-avatar" style="background:var(--qx-blue)">JR</div><span class="rank-name" style="color:var(--qx-green);font-weight:600">Tú</span><span class="rank-pts">82 pts</span></div>
+        <div class="rank-item"><span class="rank-num rn-3">3</span><div class="rank-avatar">LG</div><span class="rank-name">LuisGol</span><span class="rank-pts">78 pts</span></div>
+        <div class="rank-item"><span class="rank-num" style="color:var(--qx-muted)">4</span><div class="rank-avatar">PA</div><span class="rank-name">PakoAguila</span><span class="rank-pts">71 pts</span></div>
+        <div class="rank-item"><span class="rank-num" style="color:var(--qx-muted)">5</span><div class="rank-avatar">SR</div><span class="rank-name">SandraRey</span><span class="rank-pts">65 pts</span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+</body>
+</html>
