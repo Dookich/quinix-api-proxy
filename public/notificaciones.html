@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUINIX — Notificaciones</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --qx-green:#1DB954;--qx-green-light:#7ED957;--qx-gold:#F5C518;
+  --qx-red:#D62828;--qx-blue:#1A3FA8;--qx-purple:#8B5CF6;
+  --qx-bg:#0B1529;--qx-card:#132040;--qx-card2:#1A2D55;
+  --qx-text:#F0F4FF;--qx-muted:#8A9FCC;--qx-border:rgba(255,255,255,0.1);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:var(--qx-text);min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid var(--qx-border);background:var(--qx-card);position:sticky;top:0;z-index:100;}
+.logo{font-size:16px;font-weight:900;letter-spacing:1px;text-decoration:none;color:var(--qx-text);}
+.logo span{color:var(--qx-green-light);}
+.topbar-right{display:flex;align-items:center;gap:12px;position:relative;}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--qx-blue);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid var(--qx-border);text-decoration:none;color:var(--qx-text);}
+.bell-wrap{position:relative;}
+.bell-btn{background:none;border:none;cursor:pointer;color:var(--qx-muted);font-size:20px;padding:4px 6px;border-radius:8px;transition:background .15s;display:flex;align-items:center;}
+.bell-btn:hover{background:rgba(255,255,255,.06);color:var(--qx-text);}
+.bell-btn.active{color:var(--qx-text);}
+.notif-count{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;background:var(--qx-red);border-radius:10px;border:2px solid var(--qx-card);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;padding:0 3px;}
+.notif-dropdown{position:fixed;top:58px;right:16px;width:440px;background:var(--qx-card);border:1px solid var(--qx-border);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:200;display:none;flex-direction:column;overflow:hidden;max-height:calc(100vh - 80px);}
+.notif-dropdown.open{display:flex;}
+.nd-header{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1rem;border-bottom:1px solid var(--qx-border);flex-shrink:0;}
+.nd-title{font-size:14px;font-weight:800;}
+.nd-actions{display:flex;gap:8px;}
+.nd-btn{font-size:11px;font-weight:600;color:var(--qx-muted);background:none;border:none;cursor:pointer;padding:3px 8px;border-radius:6px;}
+.nd-btn:hover{color:var(--qx-green);background:rgba(29,185,84,.08);}
+.nd-filters{display:flex;gap:6px;padding:.625rem 1rem;border-bottom:1px solid var(--qx-border);flex-shrink:0;flex-wrap:wrap;}
+.filter-chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--qx-border);background:transparent;color:var(--qx-muted);white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.filter-chip.active{border-color:var(--qx-green);color:var(--qx-green);background:rgba(29,185,84,.08);}
+.nd-list{overflow-y:auto;flex:1;}
+.nd-list::-webkit-scrollbar{width:4px;}
+.nd-list::-webkit-scrollbar-thumb{background:var(--qx-border);border-radius:2px;}
+.nd-group-label{font-size:10px;font-weight:700;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.6px;padding:.5rem 1rem .25rem;background:var(--qx-card);}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:.75rem 1rem;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.04);position:relative;}
+.notif-item.unread{background:rgba(29,185,84,.04);}
+.notif-item.clickable{cursor:pointer;}
+.notif-item.clickable:hover{background:rgba(255,255,255,.04);}
+.notif-item.read{opacity:.6;}
+.unread-dot{position:absolute;top:50%;right:1rem;transform:translateY(-50%);width:7px;height:7px;border-radius:50%;background:var(--qx-green);}
+.notif-icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ni-green{background:rgba(29,185,84,.15);}
+.ni-gold{background:rgba(245,197,24,.12);}
+.ni-blue{background:rgba(26,63,168,.3);}
+.ni-gray{background:rgba(255,255,255,.06);}
+.ni-purple{background:rgba(139,92,246,.15);}
+.notif-body{flex:1;min-width:0;padding-right:16px;}
+.notif-title{font-size:13px;font-weight:600;line-height:1.3;margin-bottom:2px;}
+.notif-desc{font-size:12px;color:var(--qx-muted);line-height:1.4;}
+.notif-time{font-size:10px;color:var(--qx-muted);margin-top:4px;}
+.notif-cta{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:var(--qx-green);}
+.notif-cta-gold{color:var(--qx-gold);}
+.nd-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem 1rem;text-align:center;gap:8px;}
+.nd-empty-icon{font-size:36px;opacity:.4;}
+.nd-empty-text{font-size:13px;color:var(--qx-muted);}
+.nd-footer{border-top:1px solid var(--qx-border);padding:.625rem 1rem;flex-shrink:0;}
+.nd-footer-btn{width:100%;padding:8px;background:transparent;border:1px solid var(--qx-border);color:var(--qx-muted);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.nd-footer-btn:hover{border-color:var(--qx-green);color:var(--qx-green);}
+.demo-wrap{max-width:600px;margin:3rem auto;padding:0 1.25rem;text-align:center;}
+.demo-title{font-size:20px;font-weight:800;margin-bottom:.75rem;}
+.demo-sub{font-size:14px;color:var(--qx-muted);line-height:1.6;margin-bottom:2rem;}
+.demo-arrow{font-size:24px;animation:bounce .8s infinite alternate;}
+@keyframes bounce{from{transform:translateY(0);}to{transform:translateY(-8px);}}
+.demo-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:2rem;text-align:left;}
+.demo-card{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:10px;padding:.875rem;}
+.dc-icon{font-size:20px;margin-bottom:6px;}
+.dc-type{font-size:12px;font-weight:700;margin-bottom:3px;}
+.dc-desc{font-size:11px;color:var(--qx-muted);line-height:1.4;}
+.dropdown-overlay{display:none;position:fixed;inset:0;z-index:99;}
+.dropdown-overlay.active{display:block;}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--qx-green);color:#0B1529;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:700;z-index:300;transition:transform .3s;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html" class="logo">QUINI<span>X</span></a>
+  <div class="topbar-right">
+    <div class="bell-wrap">
+      <button class="bell-btn" id="bellBtn" onclick="toggleDropdown()">
+        🔔<div class="notif-count" id="notifCount">5</div>
+      </button>
+      <div class="notif-dropdown" id="notifDropdown">
+        <div class="nd-header">
+          <span class="nd-title">Notificaciones</span>
+          <div class="nd-actions">
+            <button class="nd-btn" onclick="markAllRead()">✓ Marcar todas</button>
+            <button class="nd-btn" onclick="clearAll()">🗑 Limpiar</button>
+          </div>
+        </div>
+        <div class="nd-filters" id="ndFilters"></div>
+        <div class="nd-list" id="ndList"></div>
+        <div class="nd-footer">
+          <button class="nd-footer-btn" onclick="showToast('Abriendo historial...')">Ver todas las notificaciones</button>
+        </div>
+      </div>
+    </div>
+    <a href="perfil.html" class="avatar">JR</a>
+  </div>
+</div>
+
+<div class="dropdown-overlay" id="dropdownOverlay" onclick="closeDropdown()"></div>
+
+<div class="demo-wrap">
+  <div class="demo-arrow">☝️</div>
+  <div class="demo-title">Centro de notificaciones</div>
+  <div class="demo-sub">Haz clic en la campana 🔔 arriba a la derecha para ver todas tus notificaciones.</div>
+  <div class="demo-cards">
+    <div class="demo-card"><div class="dc-icon">⏱</div><div class="dc-type">Recordatorio</div><div class="dc-desc">Cierre próximo → va a la quiniela</div></div>
+    <div class="demo-card"><div class="dc-icon">⚽</div><div class="dc-type">Resultado</div><div class="dc-desc">Marcador final → va al partido</div></div>
+    <div class="demo-card"><div class="dc-icon">📊</div><div class="dc-type">Ranking</div><div class="dc-desc">Te superaron → va al ranking</div></div>
+    <div class="demo-card"><div class="dc-icon">👥</div><div class="dc-type">Participante</div><div class="dc-desc">Nuevo jugador → informativa</div></div>
+    <div class="demo-card"><div class="dc-icon">🏆</div><div class="dc-type">Fin de jornada</div><div class="dc-desc">Resumen de puntos → estadísticas</div></div>
+    <div class="demo-card"><div class="dc-icon">💣</div><div class="dc-type">Puntos Bomba</div><div class="dc-desc">Admin asignó bombas → quiniela</div></div>
+    <div class="demo-card"><div class="dc-icon">🎉</div><div class="dc-type">¡Ganaste!</div><div class="dc-desc">1er lugar → resultado final</div></div>
+    <div class="demo-card"><div class="dc-icon">📢</div><div class="dc-type">QUINIX</div><div class="dc-desc">Novedades → informativa</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var FILTERS=[
+  {id:'all',label:'Todas'},
+  {id:'recordatorio',label:'⏱ Recordatorios'},
+  {id:'resultado',label:'⚽ Resultados'},
+  {id:'ranking',label:'📊 Ranking'},
+  {id:'participante',label:'👥 Participantes'},
+  {id:'jornada',label:'🏆 Jornadas'},
+  {id:'bomba',label:'💣 Bombas'},
+  {id:'ganador',label:'🎉 Premios'},
+  {id:'quinix',label:'📢 QUINIX'},
+];
+var NOTIFS=[
+  {id:1,group:'hoy',type:'recordatorio',icon:'⏱',iconCls:'ni-green',title:'Cierre en 30 minutos',desc:'Las predicciones del partido Monterrey vs Tigres cierran a las 20:30 hrs.',time:'Hace 5 min',unread:true,clickable:true,cta:'Ver quiniela →'},
+  {id:2,group:'hoy',type:'bomba',icon:'💣',iconCls:'ni-gold',title:'Puntos Bomba asignados — J16',desc:'El administrador asignó 5 partidos bomba para la Jornada 16.',time:'Hace 1 hora',unread:true,clickable:true,cta:'Ver partidos bomba →',ctaGold:true},
+  {id:3,group:'hoy',type:'ranking',icon:'📊',iconCls:'ni-blue',title:'¡Te superaron en el ranking!',desc:'MikeChampion ahora va en 1er lugar con 94 pts. Tú estás en 2° con 82 pts.',time:'Hace 2 horas',unread:true,clickable:true,cta:'Ver ranking →'},
+  {id:4,group:'hoy',type:'participante',icon:'👥',iconCls:'ni-gray',title:'Nuevo participante',desc:'SandraRey se unió a tu quiniela "Quiniela de los Compadres".',time:'Hace 3 horas',unread:true,clickable:false},
+  {id:5,group:'hoy',type:'resultado',icon:'⚽',iconCls:'ni-green',title:'Resultado: América 2 – 1 Chivas',desc:'Acertaste el resultado. +3 pts para ti.',time:'Hace 5 horas',unread:true,clickable:true,cta:'Ver mis puntos →'},
+  {id:6,group:'semana',type:'jornada',icon:'🏆',iconCls:'ni-gold',title:'Resumen Jornada 15',desc:'Obtuviste 9 pts en la J15. Subiste 1 posición.',time:'Hace 2 días',unread:false,clickable:true,cta:'Ver estadísticas →',ctaGold:true},
+  {id:7,group:'semana',type:'recordatorio',icon:'⏱',iconCls:'ni-green',title:'Predicciones incompletas',desc:'Faltan 3 partidos por predecir antes del cierre.',time:'Hace 3 días',unread:false,clickable:true,cta:'Llenar predicciones →'},
+  {id:8,group:'semana',type:'quinix',icon:'📢',iconCls:'ni-purple',title:'Nueva función: Estadísticas Elite',desc:'Ya puedes ver el Mapa de calor, Tendencias y más en el plan Elite.',time:'Hace 4 días',unread:false,clickable:false},
+  {id:9,group:'anterior',type:'ganador',icon:'🎉',iconCls:'ni-gold',title:'¡Ganaste la Quiniela Apertura 2025!',desc:'Terminaste en 1er lugar con 142 pts. ¡Felicidades! 🏆',time:'Hace 2 semanas',unread:false,clickable:true,cta:'Ver resultado →',ctaGold:true},
+  {id:10,group:'anterior',type:'quinix',icon:'📢',iconCls:'ni-purple',title:'¡Bienvenido a QUINIX!',desc:'Tu cuenta fue creada exitosamente.',time:'Hace 1 mes',unread:false,clickable:false},
+];
+var activeFilter='all';
+var readIds=[];
+var removedIds=[];
+
+function getFiltered(){
+  return NOTIFS.filter(function(n){
+    if(removedIds.indexOf(n.id)>=0) return false;
+    if(activeFilter==='all') return true;
+    return n.type===activeFilter;
+  });
+}
+function getUnreadCount(){
+  return NOTIFS.filter(function(n){return n.unread&&readIds.indexOf(n.id)<0&&removedIds.indexOf(n.id)<0;}).length;
+}
+function buildFilters(){
+  var wrap=document.getElementById('ndFilters');wrap.innerHTML='';
+  FILTERS.forEach(function(f){
+    var btn=document.createElement('button');
+    btn.className='filter-chip'+(f.id===activeFilter?' active':'');
+    btn.textContent=f.label;
+    btn.onclick=function(){activeFilter=f.id;buildFilters();buildList();};
+    wrap.appendChild(btn);
+  });
+}
+function buildList(){
+  var list=document.getElementById('ndList');
+  var notifs=getFiltered();
+  if(notifs.length===0){list.innerHTML='<div class="nd-empty"><div class="nd-empty-icon">🔕</div><div class="nd-empty-text">No hay notificaciones en esta categoría</div></div>';return;}
+  var groups=[{key:'hoy',label:'Hoy'},{key:'semana',label:'Esta semana'},{key:'anterior',label:'Anteriores'}];
+  var html='';
+  groups.forEach(function(g){
+    var items=notifs.filter(function(n){return n.group===g.key;});
+    if(!items.length) return;
+    html+='<div class="nd-group-label">'+g.label+'</div>';
+    items.forEach(function(n){
+      var isRead=readIds.indexOf(n.id)>=0;
+      var unread=n.unread&&!isRead;
+      html+='<div class="notif-item'+(unread?' unread':' read')+(n.clickable?' clickable':'')+'" onclick="handleClick('+n.id+')">';
+      html+='<div class="notif-icon-wrap '+n.iconCls+'">'+n.icon+'</div>';
+      html+='<div class="notif-body"><div class="notif-title">'+n.title+'</div><div class="notif-desc">'+n.desc+'</div>';
+      if(n.cta&&n.clickable) html+='<span class="notif-cta'+(n.ctaGold?' notif-cta-gold':'')+'">'+n.cta+'</span>';
+      html+='<div class="notif-time">'+n.time+'</div></div>';
+      if(unread) html+='<div class="unread-dot"></div>';
+      html+='</div>';
+    });
+  });
+  list.innerHTML=html;
+}
+function handleClick(id){
+  if(readIds.indexOf(id)<0) readIds.push(id);
+  updateCount();buildList();
+  var n=NOTIFS.find(function(x){return x.id===id;});
+  if(!n||!n.clickable) return;
+  var dest={recordatorio:'quiniela',resultado:'partido',ranking:'ranking',jornada:'estadísticas',bomba:'quiniela',ganador:'resultado final'};
+  showToast('Abriendo '+(dest[n.type]||'sección')+'...');
+}
+function markAllRead(){NOTIFS.forEach(function(n){if(readIds.indexOf(n.id)<0)readIds.push(n.id);});updateCount();buildList();showToast('✓ Todas marcadas como leídas');}
+function clearAll(){NOTIFS.forEach(function(n){if(removedIds.indexOf(n.id)<0)removedIds.push(n.id);});updateCount();buildList();showToast('🗑 Notificaciones eliminadas');}
+function updateCount(){
+  var count=getUnreadCount();
+  var badge=document.getElementById('notifCount');
+  if(count===0){badge.style.display='none';}
+  else{badge.style.display='flex';badge.textContent=count>9?'9+':count;}
+}
+function toggleDropdown(){
+  var dd=document.getElementById('notifDropdown');
+  var overlay=document.getElementById('dropdownOverlay');
+  var btn=document.getElementById('bellBtn');
+  var isOpen=dd.classList.contains('open');
+  if(isOpen){dd.classList.remove('open');overlay.classList.remove('active');btn.classList.remove('active');}
+  else{buildFilters();buildList();dd.classList.add('open');overlay.classList.add('active');btn.classList.add('active');}
+}
+function closeDropdown(){
+  document.getElementById('notifDropdown').classList.remove('open');
+  document.getElementById('dropdownOverlay').classList.remove('active');
+  document.getElementById('bellBtn').classList.remove('active');
+}
+function showToast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3000);
+}
+updateCount();
+</script>
+</body>
+</html>
