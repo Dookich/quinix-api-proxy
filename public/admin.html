@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUINIX — Admin</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --qx-green:#1DB954;--qx-green-light:#7ED957;--qx-gold:#F5C518;
+  --qx-red:#D62828;--qx-blue:#1A3FA8;
+  --qx-bg:#0B1529;--qx-card:#132040;--qx-card2:#1A2D55;
+  --qx-text:#F0F4FF;--qx-muted:#8A9FCC;--qx-border:rgba(255,255,255,0.1);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:var(--qx-text);min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid var(--qx-border);background:var(--qx-card);position:sticky;top:0;z-index:20;}
+.logo{font-size:16px;font-weight:900;letter-spacing:1px;text-decoration:none;color:var(--qx-text);}
+.logo span{color:var(--qx-green-light);}
+.btn-back{background:none;border:1.5px solid var(--qx-border);color:var(--qx-muted);padding:5px 12px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;text-decoration:none;}
+.btn-back:hover{border-color:var(--qx-text);color:var(--qx-text);}
+.q-header{background:linear-gradient(135deg,#0F2670,#1A3FA8);border-bottom:1px solid var(--qx-border);padding:1.25rem;}
+.q-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:1rem;}
+.q-name{font-size:17px;font-weight:800;}
+.q-league{font-size:12px;color:rgba(255,255,255,.55);margin-top:3px;}
+.admin-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(245,197,24,.18);color:var(--qx-gold);border:1px solid rgba(245,197,24,.3);}
+.q-stats{display:flex;gap:1.5rem;flex-wrap:wrap;}
+.q-stat-val{font-size:16px;font-weight:800;}
+.q-stat-lbl{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px;}
+.tabs-wrap{border-bottom:1px solid var(--qx-border);background:var(--qx-card);position:sticky;top:53px;z-index:19;overflow-x:auto;}
+.tabs{display:flex;min-width:max-content;}
+.tab{padding:11px 16px;font-size:13px;font-weight:600;color:var(--qx-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+.tab.active{color:var(--qx-green);border-bottom-color:var(--qx-green);}
+.content{max-width:720px;margin:0 auto;padding:1.25rem;}
+.card{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:12px;padding:1.125rem;margin-bottom:1rem;}
+.section-label{font-size:11px;font-weight:700;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:.75rem;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--qx-border);}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem;}
+.stat-card{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:10px;padding:.875rem;text-align:center;}
+.stat-val{font-size:22px;font-weight:800;}
+.stat-lbl{font-size:11px;color:var(--qx-muted);margin-top:2px;}
+.sv-green{color:var(--qx-green);}.sv-gold{color:var(--qx-gold);}.sv-blue{color:#6EB5FF;}.sv-red{color:#ff6b6b;}
+.pred-status-list{display:flex;flex-direction:column;gap:8px;}
+.pred-status-item{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:9px;}
+.ps-avatar{width:30px;height:30px;border-radius:50%;background:var(--qx-card2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.ps-name{flex:1;font-size:13px;font-weight:600;}
+.ps-prog{display:flex;flex-direction:column;gap:3px;min-width:120px;}
+.ps-bar-wrap{height:4px;background:var(--qx-card2);border-radius:2px;}
+.ps-bar{height:100%;border-radius:2px;}
+.ps-bar-green{background:var(--qx-green);}.ps-bar-yellow{background:var(--qx-gold);}.ps-bar-red{background:var(--qx-red);}
+.ps-count{font-size:10px;color:var(--qx-muted);}
+.ps-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.tag-completo{background:rgba(29,185,84,.15);color:var(--qx-green);}
+.tag-parcial{background:rgba(245,197,24,.12);color:var(--qx-gold);}
+.tag-vacio{background:rgba(214,40,40,.12);color:#ff6b6b;}
+.btn-reminder{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:transparent;border:1px solid var(--qx-border);color:var(--qx-muted);cursor:pointer;}
+.btn-reminder:hover{border-color:var(--qx-gold);color:var(--qx-gold);}
+.bomba-intro{font-size:12px;color:var(--qx-muted);margin-bottom:1rem;line-height:1.5;}
+.bomba-list{display:flex;flex-direction:column;gap:8px;}
+.bomba-item{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:.75rem 1rem;display:flex;align-items:center;gap:12px;transition:border-color .2s;}
+.bomba-item.active-bomba{border-color:rgba(245,197,24,.4);background:rgba(245,197,24,.04);}
+.bi-match{flex:1;}
+.bi-name{font-size:13px;font-weight:600;}
+.bi-time{font-size:11px;color:var(--qx-muted);margin-top:1px;}
+.toggle-sm{width:36px;height:20px;background:var(--qx-card2);border:1px solid var(--qx-border);border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle-sm.on{background:var(--qx-gold);}
+.toggle-sm-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s;}
+.toggle-sm.on .toggle-sm-thumb{transform:translateX(16px);}
+.pts-selector{display:flex;align-items:center;gap:6px;}
+.pts-btn{width:24px;height:24px;border-radius:6px;background:var(--qx-card2);border:1px solid var(--qx-border);color:var(--qx-text);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.pts-btn:hover{background:var(--qx-gold);color:#0B1529;border-color:var(--qx-gold);}
+.pts-val{font-size:14px;font-weight:800;color:var(--qx-gold);width:20px;text-align:center;}
+.pts-disabled{opacity:.35;pointer-events:none;}
+.bomba-save-row{display:flex;justify-content:flex-end;margin-top:1rem;}
+.btn-save-bomba{padding:9px 20px;background:var(--qx-gold);color:#0B1529;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
+.part-actions{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+.btn-inv{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
+.btn-inv-link{background:var(--qx-green);color:#0B1529;}
+.btn-inv-link:hover{background:var(--qx-green-light);}
+.btn-inv-email{background:transparent;border:1.5px solid var(--qx-border);color:var(--qx-text);}
+.btn-inv-email:hover{border-color:var(--qx-green);color:var(--qx-green);}
+.link-row{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:9px;padding:9px 14px;display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+.link-text{flex:1;font-size:12px;color:var(--qx-green);font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.btn-copy{background:var(--qx-green);color:#0B1529;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;}
+.part-list{display:flex;flex-direction:column;gap:8px;}
+.part-item{display:flex;align-items:center;gap:10px;background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:9px;padding:.75rem 1rem;}
+.part-av{width:32px;height:32px;border-radius:50%;background:var(--qx-card2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.part-info{flex:1;}
+.part-name{font-size:13px;font-weight:600;}
+.part-meta{font-size:11px;color:var(--qx-muted);margin-top:2px;}
+.part-pos{font-size:13px;font-weight:800;color:var(--qx-muted);min-width:24px;text-align:center;}
+.btn-remove{background:transparent;border:1px solid rgba(214,40,40,.3);color:#ff6b6b;padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;}
+.btn-remove:hover{background:rgba(214,40,40,.1);}
+.creator-tag{font-size:10px;font-weight:700;background:rgba(26,63,168,.3);color:#6EB5FF;padding:2px 8px;border-radius:10px;}
+.email-form{display:none;background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:1rem;margin-bottom:1rem;}
+.email-form.show{display:block;}
+.form-row{display:flex;gap:8px;}
+.form-input{flex:1;background:var(--qx-card);border:1px solid var(--qx-border);border-radius:8px;padding:9px 12px;color:var(--qx-text);font-size:13px;outline:none;font-family:inherit;}
+.form-input:focus{border-color:var(--qx-green);}
+.form-input::placeholder{color:var(--qx-muted);opacity:.6;}
+.btn-send{padding:9px 16px;background:var(--qx-green);color:#0B1529;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
+.partidos-res{display:flex;flex-direction:column;gap:8px;}
+.partido-res-item{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:.875rem 1rem;}
+.pr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.625rem;}
+.pr-hora{font-size:11px;color:var(--qx-muted);}
+.pr-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.tag-finalizado{background:rgba(255,255,255,.06);color:var(--qx-muted);}
+.tag-live{background:rgba(214,40,40,.15);color:#ff6b6b;animation:pulse 1.5s infinite;}
+.tag-pendiente{background:rgba(26,63,168,.2);color:#6EB5FF;}
+.tag-bomba-sm{background:rgba(245,197,24,.12);color:var(--qx-gold);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+.pr-match{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.pr-team{font-size:13px;font-weight:700;flex:1;}
+.pr-team.right{text-align:right;}
+.pr-score{font-size:16px;font-weight:900;padding:0 10px;}
+.pr-vs{font-size:11px;font-weight:700;color:var(--qx-muted);padding:0 8px;}
+.pr-aciertos{font-size:11px;color:var(--qx-muted);margin-top:.5rem;display:flex;align-items:center;gap:6px;}
+.acierto-bar{flex:1;height:4px;background:var(--qx-card2);border-radius:2px;}
+.acierto-fill{height:100%;border-radius:2px;}
+/* ESTADISTICAS */
+.stats-note{font-size:11px;color:var(--qx-muted);background:rgba(26,63,168,.15);border:1px solid rgba(26,63,168,.3);border-radius:8px;padding:8px 12px;margin-bottom:1rem;line-height:1.5;}
+.stats-table-wrap{overflow-x:auto;}
+.stats-table{width:100%;border-collapse:collapse;min-width:520px;}
+.stats-table th{font-size:11px;font-weight:700;color:var(--qx-muted);text-transform:uppercase;padding:8px 10px;text-align:center;border-bottom:1px solid var(--qx-border);}
+.stats-table th.th-name{text-align:left;}
+.stats-table td{padding:8px 10px;text-align:center;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;}
+.stats-table td.td-name{text-align:left;font-weight:600;}
+.stats-table tr:last-child td{border-bottom:none;}
+.pred-cell{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;font-size:12px;font-weight:800;}
+.pred-pending{background:var(--qx-card2);color:var(--qx-muted);}
+.pred-correct{background:rgba(29,185,84,.18);color:var(--qx-green);}
+.pred-wrong{background:rgba(214,40,40,.15);color:#ff6b6b;}
+.pred-hidden{background:var(--qx-card2);color:var(--qx-muted);font-size:10px;}
+.match-col-header{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.match-teams-small{font-size:10px;font-weight:700;color:var(--qx-text);white-space:nowrap;}
+.match-time-small{font-size:9px;color:var(--qx-muted);}
+.match-status-dot{width:6px;height:6px;border-radius:50%;margin:0 auto;}
+.dot-done{background:var(--qx-green);}.dot-live{background:#ff6b6b;animation:pulse 1.5s infinite;}.dot-pending{background:var(--qx-muted);opacity:.4;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:16px;padding:1.75rem;width:90%;max-width:360px;text-align:center;}
+.modal-icon{font-size:38px;margin-bottom:.75rem;}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--qx-muted);line-height:1.5;margin-bottom:1.5rem;}
+.modal-btns{display:flex;gap:10px;}
+.mbtn{flex:1;padding:11px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;}
+.mbtn-cancel{background:transparent;border:1.5px solid var(--qx-border);color:var(--qx-muted);}
+.mbtn-danger{background:var(--qx-red);color:#fff;}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--qx-green);color:#0B1529;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:700;z-index:200;transition:transform .3s;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html" class="logo">QUINI<span>X</span></a>
+  <a href="dashboard.html" class="btn-back">← Mi dashboard</a>
+</div>
+
+<div class="q-header">
+  <div class="q-header-top">
+    <div><div class="q-name">Quiniela de los Compadres</div><div class="q-league">Liga MX · Clausura 2026 · Jornada 16</div></div>
+    <div class="admin-badge">⚙️ Administrador</div>
+  </div>
+  <div class="q-stats">
+    <div><div class="q-stat-val sv-green">7</div><div class="q-stat-lbl">Participantes</div></div>
+    <div><div class="q-stat-val">9</div><div class="q-stat-lbl">Partidos J16</div></div>
+    <div><div class="q-stat-val sv-gold">$700</div><div class="q-stat-lbl">Pozo acumulado</div></div>
+    <div><div class="q-stat-val sv-blue">J16</div><div class="q-stat-lbl">Jornada activa</div></div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('resumen',this)">📊 Resumen</div>
+    <div class="tab" onclick="switchTab('predicciones',this)">✅ Predicciones</div>
+    <div class="tab" onclick="switchTab('estadisticas',this)">📈 Estadísticas</div>
+    <div class="tab" onclick="switchTab('bomba',this)">💣 Puntos Bomba</div>
+    <div class="tab" onclick="switchTab('participantes',this)">👥 Participantes</div>
+  </div>
+</div>
+
+<!-- RESUMEN -->
+<div id="tab-resumen" class="content">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val sv-green">5/7</div><div class="stat-lbl">Predicciones completas</div></div>
+    <div class="stat-card"><div class="stat-val sv-gold">3</div><div class="stat-lbl">Partidos bomba J16</div></div>
+    <div class="stat-card"><div class="stat-val sv-blue">2</div><div class="stat-lbl">Partidos finalizados</div></div>
+    <div class="stat-card"><div class="stat-val sv-red">2</div><div class="stat-lbl">Sin predicciones</div></div>
+  </div>
+  <div class="section-label">Partidos de la jornada</div>
+  <div class="partidos-res">
+    <div class="partido-res-item"><div class="pr-top"><span class="pr-hora">Sáb 26 · 17:00</span><span class="pr-tag tag-finalizado">Finalizado</span></div><div class="pr-match"><span class="pr-team">América</span><span class="pr-score">2 – 1</span><span class="pr-team right">Chivas</span></div><div class="pr-aciertos"><span>Aciertos: 5/7</span><div class="acierto-bar"><div class="acierto-fill" style="width:71%;background:var(--qx-green)"></div></div><span style="color:var(--qx-green);font-weight:700">71%</span></div></div>
+    <div class="partido-res-item"><div class="pr-top"><span class="pr-hora">Sáb 26 · 20:00</span><div style="display:flex;gap:6px"><span class="pr-tag tag-live">EN VIVO 67'</span><span class="pr-tag tag-bomba-sm">💣 Bomba</span></div></div><div class="pr-match"><span class="pr-team">Cruz Azul</span><span class="pr-score">1 – 1</span><span class="pr-team right">Pumas</span></div><div class="pr-aciertos"><span>Aciertos parciales: 4/7</span><div class="acierto-bar"><div class="acierto-fill" style="width:57%;background:var(--qx-gold)"></div></div><span style="color:var(--qx-gold);font-weight:700">57%</span></div></div>
+    <div class="partido-res-item"><div class="pr-top"><span class="pr-hora">Sáb 26 · 22:00</span><span class="pr-tag tag-pendiente">Pendiente</span></div><div class="pr-match"><span class="pr-team">Monterrey</span><span class="pr-vs">VS</span><span class="pr-team right">Tigres</span></div><div class="pr-aciertos"><span>Predicciones: 6/7</span><div class="acierto-bar"><div class="acierto-fill" style="width:85%;background:var(--qx-blue)"></div></div><span style="color:#6EB5FF;font-weight:700">6/7</span></div></div>
+  </div>
+</div>
+
+<!-- PREDICCIONES -->
+<div id="tab-predicciones" class="content" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+    <div style="font-size:13px;color:var(--qx-muted)">Estado de predicciones · Jornada 16</div>
+    <button class="btn-reminder" onclick="showToast('📧 Recordatorio enviado a todos')" style="border-color:rgba(245,197,24,.4);color:var(--qx-gold)">📧 Recordatorio a todos</button>
+  </div>
+  <div class="pred-status-list">
+    <div class="pred-status-item"><div class="ps-avatar" style="background:var(--qx-blue)">JR</div><div class="ps-name">Tú (José Ríos) <span style="font-size:10px;background:rgba(26,63,168,.3);color:#6EB5FF;padding:2px 7px;border-radius:8px;font-weight:700">Creador</span></div><div class="ps-prog"><div class="ps-bar-wrap"><div class="ps-bar ps-bar-green" style="width:100%"></div></div><div class="ps-count">9/9 partidos</div></div><span class="ps-tag tag-completo">Completo</span></div>
+    <div class="pred-status-item"><div class="ps-avatar">MC</div><div class="ps-name">MikeChampion</div><div class="ps-prog"><div class="ps-bar-wrap"><div class="ps-bar ps-bar-green" style="width:100%"></div></div><div class="ps-count">9/9 partidos</div></div><span class="ps-tag tag-completo">Completo</span></div>
+    <div class="pred-status-item"><div class="ps-avatar">LG</div><div class="ps-name">LuisGol</div><div class="ps-prog"><div class="ps-bar-wrap"><div class="ps-bar ps-bar-yellow" style="width:67%"></div></div><div class="ps-count">6/9 partidos</div></div><span class="ps-tag tag-parcial">Parcial</span><button class="btn-reminder" onclick="showToast('📧 Recordatorio enviado a LuisGol')">Recordar</button></div>
+    <div class="pred-status-item"><div class="ps-avatar">SR</div><div class="ps-name">SandraRey</div><div class="ps-prog"><div class="ps-bar-wrap"><div class="ps-bar ps-bar-red" style="width:0%"></div></div><div class="ps-count">0/9 partidos</div></div><span class="ps-tag tag-vacio">Sin llenar</span><button class="btn-reminder" onclick="showToast('📧 Recordatorio enviado a SandraRey')">Recordar</button></div>
+  </div>
+</div>
+
+<!-- ESTADISTICAS -->
+<div id="tab-estadisticas" class="content" style="display:none">
+  <div class="stats-note">👁️ Las predicciones solo se revelan una vez que el partido ha comenzado.</div>
+  <div class="section-label">Predicciones por participante · Jornada 16</div>
+  <div class="stats-table-wrap">
+    <table class="stats-table">
+      <thead><tr>
+        <th class="th-name">Participante</th>
+        <th><div class="match-col-header"><div class="match-status-dot dot-done"></div><div class="match-teams-small">AME vs CHI</div><div class="match-time-small">Finalizado</div></div></th>
+        <th><div class="match-col-header"><div class="match-status-dot dot-live"></div><div class="match-teams-small">CRU vs PUM</div><div class="match-time-small">En vivo 67'</div></div></th>
+        <th><div class="match-col-header"><div class="match-status-dot dot-pending"></div><div class="match-teams-small">MTY vs TIG</div><div class="match-time-small">Sáb 22:00</div></div></th>
+        <th><div class="match-col-header"><div class="match-status-dot dot-pending"></div><div class="match-teams-small">TOL vs LEÓ</div><div class="match-time-small">Dom 17:00</div></div></th>
+        <th>Pts J16</th>
+      </tr></thead>
+      <tbody id="statsTableBody"></tbody>
+    </table>
+  </div>
+  <div style="display:flex;gap:16px;margin-top:1rem;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--qx-muted)"><div style="width:10px;height:10px;border-radius:50%;background:var(--qx-green)"></div>Acertó</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--qx-muted)"><div style="width:10px;height:10px;border-radius:50%;background:#ff6b6b"></div>Falló</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--qx-muted)"><span style="font-size:16px;color:var(--qx-muted);line-height:1">–</span>Sin predicción</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--qx-muted)"><div class="pred-cell pred-hidden" style="width:20px;height:20px">?</div>Aún no visible</div>
+  </div>
+</div>
+
+<!-- BOMBA -->
+<div id="tab-bomba" class="content" style="display:none">
+  <p class="bomba-intro">El sistema auto-asigna hasta 5 partidos bomba por jornada. Puedes activar/desactivar y ajustar los puntos extra (máx. +5).</p>
+  <div class="section-label">Partidos de la Jornada 16</div>
+  <div class="bomba-list" id="bombaList"></div>
+  <div class="bomba-save-row"><button class="btn-save-bomba" onclick="showToast('💣 Puntos Bomba guardados para J16')">💾 Guardar configuración bomba</button></div>
+</div>
+
+<!-- PARTICIPANTES -->
+<div id="tab-participantes" class="content" style="display:none">
+  <div style="font-size:12px;color:var(--qx-muted);margin-bottom:1rem">7 / 10 participantes · Plan Amateur</div>
+  <div class="part-actions">
+    <button class="btn-inv btn-inv-link" onclick="copyInvLink()">🔗 Copiar link</button>
+    <button class="btn-inv btn-inv-email" onclick="toggleEmailForm()">📧 Invitar por email</button>
+  </div>
+  <div class="link-row"><span class="link-text">quinix.app/q/quiniela-compadres-2026</span><button class="btn-copy" onclick="copyInvLink()">Copiar</button></div>
+  <div class="email-form" id="emailForm">
+    <div style="font-size:12px;color:var(--qx-muted);margin-bottom:8px">Ingresa el correo del participante</div>
+    <div class="form-row"><input class="form-input" type="email" placeholder="correo@ejemplo.com" id="emailInput"><button class="btn-send" onclick="sendEmailInvite()">Enviar</button></div>
+  </div>
+  <div class="section-label">Participantes actuales</div>
+  <div class="part-list">
+    <div class="part-item"><div class="part-pos" style="color:var(--qx-gold)">1°</div><div class="part-av" style="background:var(--qx-blue)">JR</div><div class="part-info"><div class="part-name">José Ríos <span class="creator-tag">Creador</span></div><div class="part-meta">94 pts · 9/9 predicciones</div></div></div>
+    <div class="part-item"><div class="part-pos" style="color:var(--qx-gold)">1°</div><div class="part-av">MC</div><div class="part-info"><div class="part-name">MikeChampion</div><div class="part-meta">94 pts · 9/9 predicciones</div></div><button class="btn-remove" onclick="confirmRemove('MikeChampion')">Eliminar</button></div>
+    <div class="part-item"><div class="part-pos" style="color:#C0C0C0">3°</div><div class="part-av">LG</div><div class="part-info"><div class="part-name">LuisGol</div><div class="part-meta">78 pts · 6/9 predicciones</div></div><button class="btn-remove" onclick="confirmRemove('LuisGol')">Eliminar</button></div>
+    <div class="part-item"><div class="part-pos">4°</div><div class="part-av">SR</div><div class="part-info"><div class="part-name">SandraRey</div><div class="part-meta">65 pts · 0/9 predicciones</div></div><button class="btn-remove" onclick="confirmRemove('SandraRey')">Eliminar</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="removeModal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">¿Eliminar participante?</div>
+    <div class="modal-sub">¿Estás seguro que deseas eliminar a <strong id="removeTarget"></strong>? Esta acción no se puede deshacer.</div>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-cancel" onclick="document.getElementById('removeModal').classList.remove('active')">Cancelar</button>
+      <button class="mbtn mbtn-danger" onclick="doRemove()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var PARTIDOS=[
+  {home:'América',away:'Chivas',time:'Sáb 26 · 17:00',status:'finished'},
+  {home:'Cruz Azul',away:'Pumas',time:'Sáb 26 · 20:00',status:'live'},
+  {home:'Monterrey',away:'Tigres',time:'Sáb 26 · 22:00',status:'pending'},
+  {home:'Toluca',away:'León',time:'Dom 27 · 17:00',status:'pending'},
+  {home:'Santos',away:'Atlas',time:'Dom 27 · 19:00',status:'pending'},
+];
+var bombaState=PARTIDOS.map(function(p,i){return{home:p.home,away:p.away,time:p.time,status:p.status,bomba:i<3,pts:i===0?3:i===1?2:1};});
+
+var MATCH_STATUS=['finished','live','pending','pending'];
+var CORRECT_RES=['L','E',null,null];
+var PARTICIPANTS=[
+  {name:'José Ríos',av:'JR',preds:['L','E',null,null],pts:9},
+  {name:'MikeChampion',av:'MC',preds:['L','E',null,null],pts:12},
+  {name:'LuisGol',av:'LG',preds:['L','L',null,null],pts:8},
+  {name:'SandraRey',av:'SR',preds:[null,null,null,null],pts:0},
+];
+
+function buildStatsTable(){
+  var tbody=document.getElementById('statsTableBody');
+  if(!tbody) return;
+  tbody.innerHTML='';
+  PARTICIPANTS.forEach(function(p){
+    var tr=document.createElement('tr');
+    var cells='<td class="td-name"><div style="display:flex;align-items:center;gap:7px"><div style="width:26px;height:26px;border-radius:50%;background:var(--qx-card2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">'+p.av+'</div>'+p.name+'</div></td>';
+    p.preds.forEach(function(pred,i){
+      var status=MATCH_STATUS[i];
+      var correct=CORRECT_RES[i];
+      var cell='';
+      if(status==='pending'){cell='<div class="pred-cell pred-hidden">?</div>';}
+      else if(pred===null){cell='<span style="font-size:18px;color:var(--qx-muted);line-height:1">–</span>';}
+      else if(status==='live'){cell='<div class="pred-cell pred-pending">'+pred+'</div>';}
+      else{var ok=pred===correct;cell='<div class="pred-cell '+(ok?'pred-correct':'pred-wrong')+'">'+pred+'</div>';}
+      cells+='<td>'+cell+'</td>';
+    });
+    cells+='<td style="font-weight:800;color:var(--qx-green)">'+p.pts+'</td>';
+    tr.innerHTML=cells;tbody.appendChild(tr);
+  });
+}
+
+function buildBomba(){
+  var list=document.getElementById('bombaList');
+  list.innerHTML='';
+  bombaState.forEach(function(p,i){
+    var isFinished=p.status==='finished'||p.status==='live';
+    var item=document.createElement('div');
+    item.className='bomba-item'+(p.bomba?' active-bomba':'');
+    item.id='bi'+i;
+    item.innerHTML='<div style="flex:1"><div class="bi-name">'+p.home+' vs '+p.away+'</div><div class="bi-time">'+p.time+(isFinished?' · <span style="color:#ff6b6b;font-size:10px">'+(p.status==='live'?'En vivo':'Finalizado')+'</span>':'')+'</div></div>'
+      +'<div style="display:flex;align-items:center;gap:8px"><div class="toggle-sm'+(p.bomba?' on':'')+'" id="btog'+i+'" onclick="'+(isFinished?'':('toggleBomba('+i+')'))+'" style="'+(isFinished?'opacity:.4;cursor:default':'')+'" ><div class="toggle-sm-thumb"></div></div></div>'
+      +'<div class="pts-selector'+(p.bomba?'':' pts-disabled')+'" id="bpts-wrap'+i+'"><span style="font-size:11px;color:var(--qx-muted);margin-right:4px">+pts:</span><button class="pts-btn" onclick="chgPts('+i+',-1)">−</button><div class="pts-val" id="bptsval'+i+'">'+p.pts+'</div><button class="pts-btn" onclick="chgPts('+i+',1)">+</button></div>';
+    list.appendChild(item);
+  });
+}
+
+function toggleBomba(i){
+  bombaState[i].bomba=!bombaState[i].bomba;
+  document.getElementById('bi'+i).classList.toggle('active-bomba',bombaState[i].bomba);
+  document.getElementById('btog'+i).classList.toggle('on',bombaState[i].bomba);
+  document.getElementById('bpts-wrap'+i).classList.toggle('pts-disabled',!bombaState[i].bomba);
+}
+function chgPts(i,d){
+  if(!bombaState[i].bomba) return;
+  bombaState[i].pts=Math.max(1,Math.min(5,bombaState[i].pts+d));
+  document.getElementById('bptsval'+i).textContent=bombaState[i].pts;
+}
+
+function switchTab(tab,el){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+  ['resumen','predicciones','estadisticas','bomba','participantes'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display=t===tab?'block':'none';
+  });
+  if(tab==='bomba') buildBomba();
+  if(tab==='estadisticas') buildStatsTable();
+}
+
+var removeTarget='';
+function confirmRemove(name){removeTarget=name;document.getElementById('removeTarget').textContent=name;document.getElementById('removeModal').classList.add('active');}
+function closeModal(e){if(e.target.classList.contains('modal-overlay'))e.target.classList.remove('active');}
+function doRemove(){document.getElementById('removeModal').classList.remove('active');showToast('🗑️ '+removeTarget+' eliminado');}
+function copyInvLink(){navigator.clipboard.writeText('quinix.app/q/quiniela-compadres-2026').then(function(){showToast('🔗 Link copiado');});}
+function toggleEmailForm(){document.getElementById('emailForm').classList.toggle('show');}
+function sendEmailInvite(){var v=document.getElementById('emailInput').value.trim();if(!v)return;document.getElementById('emailInput').value='';document.getElementById('emailForm').classList.remove('show');showToast('📧 Invitación enviada a '+v);}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
+</script>
+</body>
+</html>
