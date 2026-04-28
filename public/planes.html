@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUINIX — Planes</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --qx-green:#1DB954;--qx-green-light:#7ED957;--qx-gold:#F5C518;
+  --qx-red:#D62828;--qx-blue:#1A3FA8;--qx-purple:#8B5CF6;
+  --qx-bg:#0B1529;--qx-card:#132040;--qx-card2:#1A2D55;
+  --qx-text:#F0F4FF;--qx-muted:#8A9FCC;--qx-border:rgba(255,255,255,0.1);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:var(--qx-text);min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid var(--qx-border);background:var(--qx-card);position:sticky;top:0;z-index:20;}
+.logo{font-size:16px;font-weight:900;letter-spacing:1px;text-decoration:none;color:var(--qx-text);}
+.logo span{color:var(--qx-green-light);}
+.btn-back{background:none;border:1.5px solid var(--qx-border);color:var(--qx-muted);padding:5px 12px;border-radius:7px;font-size:12px;font-weight:600;text-decoration:none;}
+.hero{text-align:center;padding:2.5rem 1.25rem 1.5rem;}
+.hero-badge{display:inline-block;background:rgba(245,197,24,.12);border:1px solid rgba(245,197,24,.3);color:var(--qx-gold);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:1rem;}
+.hero h1{font-size:28px;font-weight:900;line-height:1.2;margin-bottom:.75rem;}
+.hero h1 span{color:var(--qx-green-light);}
+.hero p{font-size:14px;color:var(--qx-muted);max-width:480px;margin:0 auto;}
+.current-banner{max-width:860px;margin:0 auto 1.5rem;padding:0 1.25rem;}
+.current-card{background:rgba(29,185,84,.07);border:1px solid rgba(29,185,84,.2);border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.cc-info{flex:1;}
+.cc-title{font-size:14px;font-weight:700;}
+.cc-sub{font-size:12px;color:var(--qx-muted);margin-top:2px;}
+.cc-badge{font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;background:rgba(29,185,84,.15);color:var(--qx-green);border:1px solid rgba(29,185,84,.3);white-space:nowrap;}
+.billing-wrap{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:2rem;}
+.billing-lbl{font-size:14px;font-weight:600;cursor:pointer;}
+.billing-lbl.active{color:var(--qx-text);}
+.billing-lbl.inactive{color:var(--qx-muted);}
+.toggle-track{width:48px;height:26px;background:var(--qx-card2);border:1px solid var(--qx-border);border-radius:13px;cursor:pointer;position:relative;transition:background .2s;}
+.toggle-track.annual{background:var(--qx-green);}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s;}
+.toggle-track.annual .toggle-thumb{transform:translateX(22px);}
+.save-badge{background:rgba(245,197,24,.15);border:1px solid rgba(245,197,24,.3);color:var(--qx-gold);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.plans-wrap{max-width:960px;margin:0 auto;padding:0 1.25rem 2rem;}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.plan-card{background:var(--qx-card);border:1.5px solid var(--qx-border);border-radius:16px;padding:1.5rem;display:flex;flex-direction:column;position:relative;transition:transform .2s;}
+.plan-card:hover{transform:translateY(-2px);}
+.plan-card.pro{border-color:rgba(29,185,84,.4);}
+.plan-card.elite{border-color:rgba(245,197,24,.4);}
+.plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:800;padding:4px 14px;border-radius:20px;white-space:nowrap;}
+.pb-pro{background:var(--qx-green);color:#0B1529;}
+.pb-elite{background:var(--qx-gold);color:#0B1529;}
+.pb-current{background:var(--qx-card2);color:var(--qx-muted);border:1px solid var(--qx-border);}
+.plan-name{font-size:12px;font-weight:700;color:var(--qx-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.plan-price{font-size:34px;font-weight:900;line-height:1;}
+.plan-price span{font-size:13px;font-weight:400;color:var(--qx-muted);}
+.plan-note{font-size:11px;color:var(--qx-muted);margin-top:4px;min-height:16px;}
+.plan-divider{border:none;border-top:1px solid var(--qx-border);margin:1.25rem 0;}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:8px;flex:1;margin-bottom:1.25rem;}
+.plan-features li{font-size:12px;color:var(--qx-muted);display:flex;gap:7px;align-items:flex-start;line-height:1.4;}
+.ck-green{color:var(--qx-green);font-weight:700;flex-shrink:0;}
+.ck-gold{color:var(--qx-gold);font-weight:700;flex-shrink:0;}
+.ck-no{color:var(--qx-muted);opacity:.4;flex-shrink:0;}
+.btn-plan{width:100%;padding:11px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-decoration:none;display:block;text-align:center;}
+.btn-current{background:transparent;border:1.5px solid var(--qx-border);color:var(--qx-muted);cursor:default;}
+.btn-pro{background:var(--qx-green);color:#0B1529;}
+.btn-pro:hover{background:var(--qx-green-light);}
+.btn-elite{background:var(--qx-gold);color:#0B1529;}
+.btn-elite:hover{background:#f7d045;}
+.compare-wrap{max-width:960px;margin:0 auto 2rem;padding:0 1.25rem;}
+.compare-title{font-size:18px;font-weight:800;text-align:center;margin-bottom:1.25rem;}
+.compare-table{width:100%;border-collapse:collapse;background:var(--qx-card);border-radius:12px;overflow:hidden;border:1px solid var(--qx-border);}
+.compare-table th{padding:12px 16px;font-size:12px;font-weight:700;text-align:center;border-bottom:1px solid var(--qx-border);}
+.compare-table th:first-child{text-align:left;color:var(--qx-muted);}
+.compare-table th.th-pro{color:var(--qx-green);}
+.compare-table th.th-elite{color:var(--qx-gold);}
+.compare-table td{padding:10px 16px;font-size:12px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04);}
+.compare-table td:first-child{text-align:left;color:var(--qx-muted);font-weight:500;}
+.compare-table tr:last-child td{border-bottom:none;}
+.ct-section{background:var(--qx-card2);}
+.ct-section td{font-size:11px;font-weight:700;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 16px;}
+.check-green{color:var(--qx-green);font-size:15px;}
+.check-gold{color:var(--qx-gold);font-size:15px;}
+.check-no{color:var(--qx-muted);opacity:.3;font-size:15px;}
+.addons-wrap{max-width:960px;margin:0 auto 2rem;padding:0 1.25rem;}
+.addons-title{font-size:18px;font-weight:800;text-align:center;margin-bottom:.5rem;}
+.addons-sub{font-size:13px;color:var(--qx-muted);text-align:center;margin-bottom:1.25rem;}
+.addons-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:1.25rem;}
+.addon-tab-btn{padding:6px 18px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--qx-border);background:transparent;color:var(--qx-muted);transition:all .2s;}
+.addon-tab-btn.ap{border-color:var(--qx-green);color:var(--qx-green);background:rgba(29,185,84,.08);}
+.addon-tab-btn.ae{border-color:var(--qx-gold);color:var(--qx-gold);background:rgba(245,197,24,.08);}
+.addons-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.addon-card{background:var(--qx-card);border-radius:12px;padding:1.125rem;display:flex;flex-direction:column;gap:4px;}
+.addon-card.pro-addon{border:1px solid rgba(29,185,84,.25);}
+.addon-card.elite-addon{border:1px solid rgba(245,197,24,.25);}
+.addon-name{font-size:13px;font-weight:700;}
+.addon-desc{font-size:12px;color:var(--qx-muted);line-height:1.4;flex:1;}
+.addon-price{font-size:14px;font-weight:800;margin-top:8px;}
+.addon-price.pp{color:var(--qx-green);}
+.addon-price.ep{color:var(--qx-gold);}
+.btn-add-addon{margin-top:8px;padding:7px;border-radius:7px;font-size:12px;font-weight:700;cursor:default;border:none;width:100%;background:transparent;color:var(--qx-muted);border:1px solid var(--qx-border);}
+.faq-wrap{max-width:700px;margin:0 auto 3rem;padding:0 1.25rem;}
+.faq-title{font-size:18px;font-weight:800;text-align:center;margin-bottom:1.25rem;}
+.faq-item{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:1rem;cursor:pointer;font-size:13px;font-weight:600;}
+.faq-q:hover{background:rgba(255,255,255,.02);}
+.faq-arrow{font-size:12px;color:var(--qx-muted);transition:transform .2s;}
+.faq-a{font-size:12px;color:var(--qx-muted);line-height:1.6;padding:0 1rem 1rem;display:none;}
+.faq-item.open .faq-arrow{transform:rotate(180deg);}
+.faq-item.open .faq-a{display:block;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:18px;padding:2rem;width:90%;max-width:420px;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;}
+.modal-title{font-size:18px;font-weight:800;}
+.modal-close{background:none;border:none;color:var(--qx-muted);cursor:pointer;font-size:18px;}
+.modal-features{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;}
+.modal-features li{font-size:13px;color:var(--qx-muted);display:flex;gap:8px;}
+.modal-billing{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:1rem;margin-bottom:1.25rem;}
+.mb-title{font-size:12px;font-weight:700;color:var(--qx-muted);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.4px;}
+.mb-opts{display:flex;gap:8px;}
+.mb-opt{flex:1;padding:.75rem;border-radius:8px;border:1.5px solid var(--qx-border);background:transparent;cursor:pointer;text-align:center;transition:all .2s;}
+.mb-opt.selected{border-color:var(--qx-green);background:rgba(29,185,84,.08);}
+.mb-opt.selected-gold{border-color:var(--qx-gold);background:rgba(245,197,24,.08);}
+.mb-opt-price{font-size:16px;font-weight:800;}
+.mb-opt-lbl{font-size:10px;color:var(--qx-muted);margin-top:2px;}
+.mb-opt-save{font-size:10px;font-weight:700;color:var(--qx-gold);}
+.btn-confirm{width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;}
+.btn-confirm-pro{background:var(--qx-green);color:#0B1529;}
+.btn-confirm-elite{background:var(--qx-gold);color:#0B1529;}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--qx-green);color:#0B1529;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:700;z-index:200;transition:transform .3s;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+@media(max-width:640px){.plans-grid{grid-template-columns:1fr;}.mb-opts{flex-direction:column;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html" class="logo">QUINI<span>X</span></a>
+  <a href="dashboard.html" class="btn-back">← Dashboard</a>
+</div>
+
+<div class="hero">
+  <div class="hero-badge">⭐ Mundial FIFA 2026 se viene</div>
+  <h1>El plan perfecto para<br>cada <span>quinielero</span></h1>
+  <p>Empieza gratis y sube cuando quieras. Cancela en cualquier momento.</p>
+</div>
+
+<div class="current-banner">
+  <div class="current-card">
+    <div style="font-size:22px">📋</div>
+    <div class="cc-info">
+      <div class="cc-title">Tu plan actual: Amateur</div>
+      <div class="cc-sub">Gratuito · 1 quiniela · Liga MX y Liga MX Femenil</div>
+    </div>
+    <div class="cc-badge">✓ Plan activo</div>
+  </div>
+</div>
+
+<div class="billing-wrap">
+  <span class="billing-lbl active" id="lblM" onclick="setBilling('monthly')">Mensual</span>
+  <div class="toggle-track" id="billingToggle" onclick="toggleBilling()"><div class="toggle-thumb"></div></div>
+  <span class="billing-lbl inactive" id="lblA" onclick="setBilling('annual')">Anual</span>
+  <span class="save-badge">Ahorra ~20%</span>
+</div>
+
+<div class="plans-wrap">
+  <div class="plans-grid">
+    <div class="plan-card">
+      <div class="plan-badge pb-current">Tu plan actual</div>
+      <div class="plan-name">Amateur</div>
+      <div class="plan-price">$0 <span>MXN</span></div>
+      <div class="plan-note">Siempre gratis</div>
+      <hr class="plan-divider">
+      <ul class="plan-features">
+        <li><span class="ck-green">✓</span>1 quiniela activa</li>
+        <li><span class="ck-green">✓</span>Liga MX o Liga MX Femenil</li>
+        <li><span class="ck-green">✓</span>Hasta 10 participantes</li>
+        <li><span class="ck-green">✓</span>Predicción 1X2</li>
+        <li><span class="ck-no">–</span><span style="opacity:.5">Ligas europeas y Mundial</span></li>
+        <li><span class="ck-no">–</span><span style="opacity:.5">Puntos Bomba</span></li>
+      </ul>
+      <button class="btn-plan btn-current" disabled>Plan actual</button>
+    </div>
+    <div class="plan-card pro">
+      <div class="plan-badge pb-pro">MÁS POPULAR</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price" id="proPriceDisplay">$99 <span>MXN/mes</span></div>
+      <div class="plan-note" id="proNoteDisplay">Facturado mensualmente</div>
+      <hr class="plan-divider">
+      <ul class="plan-features">
+        <li><span class="ck-green">✓</span>5 quinielas activas</li>
+        <li><span class="ck-green">✓</span>Todas las ligas + Mundial 2026</li>
+        <li><span class="ck-green">✓</span>Hasta 30 participantes</li>
+        <li><span class="ck-green">✓</span>3 modos de predicción</li>
+        <li><span class="ck-green">✓</span>Puntos Bomba</li>
+        <li><span class="ck-green">✓</span>Estadísticas Pro</li>
+        <li><span class="ck-green">✓</span>Notificaciones por email</li>
+        <li><span class="ck-green">✓</span>Add-ons Pro</li>
+      </ul>
+      <button class="btn-plan btn-pro" onclick="openModal('pro')">Obtener Pro →</button>
+    </div>
+    <div class="plan-card elite">
+      <div class="plan-badge pb-elite">ELITE</div>
+      <div class="plan-name">Elite</div>
+      <div class="plan-price" id="elitePriceDisplay">$199 <span>MXN/mes</span></div>
+      <div class="plan-note" id="eliteNoteDisplay">Facturado mensualmente</div>
+      <hr class="plan-divider">
+      <ul class="plan-features">
+        <li><span class="ck-gold">✓</span>15 quinielas activas</li>
+        <li><span class="ck-gold">✓</span>Todas las ligas + Mundial 2026</li>
+        <li><span class="ck-gold">✓</span>Hasta 100 participantes</li>
+        <li><span class="ck-gold">✓</span>Todos los modos de predicción</li>
+        <li><span class="ck-gold">✓</span>Estadísticas Elite + Exportación</li>
+        <li><span class="ck-gold">✓</span>Head to Head + Predictor</li>
+        <li><span class="ck-gold">✓</span>Jornada perfecta</li>
+        <li><span class="ck-gold">✓</span>Todos los add-ons</li>
+      </ul>
+      <button class="btn-plan btn-elite" onclick="openModal('elite')">Obtener Elite →</button>
+    </div>
+  </div>
+</div>
+
+<div class="compare-wrap">
+  <div class="compare-title">Comparativa completa</div>
+  <div style="overflow-x:auto">
+    <table class="compare-table">
+      <thead><tr>
+        <th style="width:40%">Característica</th>
+        <th>Amateur</th>
+        <th class="th-pro">Pro</th>
+        <th class="th-elite">Elite</th>
+      </tr></thead>
+      <tbody id="compareBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="addons-wrap">
+  <div class="addons-title">Add-ons disponibles</div>
+  <div class="addons-sub">Potencia tu plan con funciones extra.</div>
+  <div class="addons-tabs">
+    <button class="addon-tab-btn ap" id="addonTabPro" onclick="switchAddonTab('pro')">Plan Pro</button>
+    <button class="addon-tab-btn" id="addonTabElite" onclick="switchAddonTab('elite')">Plan Elite</button>
+  </div>
+  <div class="addons-grid" id="addonsGrid"></div>
+</div>
+
+<div class="faq-wrap">
+  <div class="faq-title">Preguntas frecuentes</div>
+  <div id="faqList"></div>
+</div>
+
+<div class="modal-overlay" id="upgradeModal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Obtener Pro</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div style="font-size:26px;font-weight:900;margin-bottom:4px" id="modalPlanName">Pro</div>
+    <div style="font-size:15px;color:var(--qx-muted);margin-bottom:1.25rem" id="modalPlanPrice">$99 MXN/mes</div>
+    <ul class="modal-features" id="modalFeatures"></ul>
+    <div class="modal-billing">
+      <div class="mb-title">Facturación</div>
+      <div class="mb-opts" id="modalBillingOpts"></div>
+    </div>
+    <button class="btn-confirm" id="modalConfirmBtn" onclick="confirmUpgrade()">Confirmar y pagar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var isAnnual=false;
+var currentModalPlan='pro';
+
+var COMPARE_ROWS=[
+  {section:'Quinielas'},
+  {feat:'Quinielas activas',am:'1',pro:'5',el:'15'},
+  {feat:'Participantes por quiniela',am:'10',pro:'30',el:'100'},
+  {section:'Torneos y ligas'},
+  {feat:'Liga MX',am:'✓',pro:'✓',el:'✓',amG:true,proG:true,elG:true},
+  {feat:'Liga MX Femenil',am:'✓',pro:'✓',el:'✓',amG:true,proG:true,elG:true},
+  {feat:'Ligas europeas (8 ligas)',am:'–',pro:'✓',el:'✓',proG:true,elG:true},
+  {feat:'Mundial FIFA 2026',am:'–',pro:'✓',el:'✓',proG:true,elG:true},
+  {section:'Predicciones'},
+  {feat:'Modo 1X2',am:'✓',pro:'✓',el:'✓',amG:true,proG:true,elG:true},
+  {feat:'Marcador exacto',am:'–',pro:'✓',el:'✓',proG:true,elG:true},
+  {feat:'Modo combinado',am:'–',pro:'✓',el:'✓',proG:true,elG:true},
+  {feat:'Puntos Bomba',am:'–',pro:'✓',el:'✓',proG:true,elG:true},
+  {feat:'Jornada perfecta',am:'–',pro:'–',el:'✓',elG:true},
+  {section:'Estadísticas'},
+  {feat:'Tabla básica',am:'✓',pro:'✓',el:'✓',amG:true,proG:true,elG:true},
+  {feat:'Estadísticas Pro',am:'–',pro:'✓',el:'✓',proG:true,elG:true},
+  {feat:'Estadísticas Elite',am:'–',pro:'–',el:'✓',elG:true},
+  {feat:'Exportación PDF y Excel',am:'–',pro:'–',el:'✓',elG:true},
+  {section:'Extras'},
+  {feat:'Notificaciones por email',am:'–',pro:'✓',el:'✓',proG:true,elG:true},
+  {feat:'Ver predicciones de otros',am:'–',pro:'✓',el:'✓',proG:true,elG:true},
+  {feat:'Historial completo',am:'–',pro:'✓',el:'✓',proG:true,elG:true},
+  {feat:'Acceso a add-ons',am:'–',pro:'✓',el:'✓ (todos)',proG:true,elG:true},
+];
+
+var ADDONS={
+  pro:[
+    {name:'Participantes extra',desc:'+20 participantes adicionales por quiniela',price:'+$29 MXN/mes'},
+    {name:'Quiniela extra',desc:'+1 quiniela activa adicional',price:'+$19 MXN/mes'},
+    {name:'Estadísticas Pro',desc:'Gráficas avanzadas y exportación',price:'+$29 MXN/mes'},
+  ],
+  elite:[
+    {name:'Participantes extra',desc:'+20 participantes adicionales por quiniela',price:'+$29 MXN/mes'},
+    {name:'Quiniela extra',desc:'+1 quiniela activa adicional',price:'+$19 MXN/mes'},
+    {name:'Estadísticas Pro',desc:'Gráficas avanzadas y exportación',price:'+$29 MXN/mes'},
+    {name:'Liga personalizada',desc:'Mezcla partidos de cualquier torneo en una liga propia',price:'+$29 MXN/mes'},
+  ]
+};
+
+var FAQS=[
+  {q:'¿Puedo cancelar en cualquier momento?',a:'Sí. Puedes cancelar cuando quieras. Seguirás teniendo acceso hasta el final del periodo facturado.'},
+  {q:'¿Qué pasa con mis quinielas si cancelo?',a:'Tus quinielas activas se mantendrán hasta que terminen. Al vencer tu plan pasarás al plan Amateur.'},
+  {q:'¿Puedo cambiar entre mensual y anual?',a:'Sí. Puedes cambiar tu ciclo de facturación en cualquier momento desde tu perfil.'},
+  {q:'¿Cómo funcionan los add-ons?',a:'Los add-ons son cobros adicionales a tu plan. Puedes añadir o quitar add-ons en cualquier momento.'},
+  {q:'¿El plan Elite incluye todo lo de Pro?',a:'Sí, el plan Elite incluye todas las funciones de Pro más estadísticas avanzadas, exportación y más.'},
+  {q:'¿Puedo invitar a alguien sin plan de pago?',a:'Sí. Cualquier usuario puede participar en una quiniela a la que sea invitado, sin importar su plan.'},
+];
+
+function buildCompare(){
+  var tbody=document.getElementById('compareBody');
+  COMPARE_ROWS.forEach(function(r){
+    var tr=document.createElement('tr');
+    if(r.section){tr.className='ct-section';tr.innerHTML='<td colspan="4">'+r.section+'</td>';}
+    else{
+      var amC=r.amG?'<span class="check-green">✓</span>':(r.am==='–'?'<span class="check-no">–</span>':'<span style="font-size:11px;color:var(--qx-muted)">'+r.am+'</span>');
+      var proC=r.proG?'<span class="check-green">✓</span>':(r.pro==='–'?'<span class="check-no">–</span>':'<span style="font-size:11px;color:var(--qx-green)">'+r.pro+'</span>');
+      var elC=r.elG?'<span class="check-gold">✓</span>':(r.el==='–'?'<span class="check-no">–</span>':'<span style="font-size:11px;color:var(--qx-gold)">'+r.el+'</span>');
+      tr.innerHTML='<td>'+r.feat+'</td><td>'+amC+'</td><td>'+proC+'</td><td>'+elC+'</td>';
+    }
+    tbody.appendChild(tr);
+  });
+}
+
+function buildAddons(tab){
+  var grid=document.getElementById('addonsGrid');grid.innerHTML='';
+  var isPro=tab==='pro';
+  ADDONS[tab].forEach(function(a){
+    grid.innerHTML+='<div class="addon-card '+(isPro?'pro-addon':'elite-addon')+'"><div class="addon-name">'+a.name+'</div><div class="addon-desc">'+a.desc+'</div><div class="addon-price '+(isPro?'pp':'ep')+'">'+a.price+'</div><button class="btn-add-addon">🔒 Requiere plan '+(isPro?'Pro':'Elite')+'</button></div>';
+  });
+}
+
+function switchAddonTab(tab){
+  document.getElementById('addonTabPro').className='addon-tab-btn'+(tab==='pro'?' ap':'');
+  document.getElementById('addonTabElite').className='addon-tab-btn'+(tab==='elite'?' ae':'');
+  buildAddons(tab);
+}
+
+function buildFAQ(){
+  var list=document.getElementById('faqList');
+  FAQS.forEach(function(f,i){
+    var item=document.createElement('div');item.className='faq-item';
+    item.innerHTML='<div class="faq-q" onclick="document.querySelectorAll(\'.faq-item\')['+i+'].classList.toggle(\'open\')">'+f.q+'<span class="faq-arrow">▼</span></div><div class="faq-a">'+f.a+'</div>';
+    list.appendChild(item);
+  });
+}
+
+function toggleBilling(){setBilling(isAnnual?'monthly':'annual');}
+function setBilling(mode){
+  isAnnual=mode==='annual';
+  document.getElementById('billingToggle').classList.toggle('annual',isAnnual);
+  document.getElementById('lblM').className='billing-lbl'+(isAnnual?' inactive':' active');
+  document.getElementById('lblA').className='billing-lbl'+(isAnnual?' active':' inactive');
+  document.getElementById('proPriceDisplay').innerHTML=isAnnual?'$79 <span>MXN/mes</span>':'$99 <span>MXN/mes</span>';
+  document.getElementById('proNoteDisplay').textContent=isAnnual?'Facturado $948 al año':'Facturado mensualmente';
+  document.getElementById('elitePriceDisplay').innerHTML=isAnnual?'$159 <span>MXN/mes</span>':'$199 <span>MXN/mes</span>';
+  document.getElementById('eliteNoteDisplay').textContent=isAnnual?'Facturado $1,908 al año':'Facturado mensualmente';
+}
+
+function openModal(plan){
+  currentModalPlan=plan;
+  var isPro=plan==='pro';
+  document.getElementById('modalTitle').textContent='Obtener '+(isPro?'Pro':'Elite');
+  document.getElementById('modalPlanName').textContent=isPro?'Pro':'Elite';
+  document.getElementById('modalPlanName').style.color=isPro?'var(--qx-green)':'var(--qx-gold)';
+  var price=isPro?(isAnnual?'$79':'$99'):(isAnnual?'$159':'$199');
+  document.getElementById('modalPlanPrice').textContent=price+' MXN/mes';
+  var feats=isPro?['5 quinielas activas','Todas las ligas + Mundial 2026','Hasta 30 participantes','3 modos de predicción','Puntos Bomba','Estadísticas Pro']:['15 quinielas activas','Todas las ligas + Mundial 2026','Hasta 100 participantes','Estadísticas Elite + Exportación','Head to Head y Predictor','Todos los add-ons'];
+  var ck=isPro?'var(--qx-green)':'var(--qx-gold)';
+  document.getElementById('modalFeatures').innerHTML=feats.map(function(f){return '<li><span style="color:'+ck+';font-weight:700">✓</span> '+f+'</li>';}).join('');
+  var opts=document.getElementById('modalBillingOpts');
+  opts.innerHTML='<div class="mb-opt'+(!isAnnual?' selected'+(!isPro?'-gold':''):'')+'" onclick="selectBillingOpt(\'monthly\')"><div class="mb-opt-price">'+(isPro?'$99':'$199')+'</div><div class="mb-opt-lbl">MXN/mes · Mensual</div></div>'
+    +'<div class="mb-opt'+(isAnnual?' selected'+(!isPro?'-gold':''):'')+'" onclick="selectBillingOpt(\'annual\')"><div class="mb-opt-price">'+(isPro?'$79':'$159')+'</div><div class="mb-opt-lbl">MXN/mes · Anual</div><div class="mb-opt-save">Ahorra ~20%</div></div>';
+  document.getElementById('modalConfirmBtn').className='btn-confirm '+(isPro?'btn-confirm-pro':'btn-confirm-elite');
+  document.getElementById('upgradeModal').classList.add('active');
+}
+
+function selectBillingOpt(mode){
+  var isPro=currentModalPlan==='pro';
+  var sel='selected'+(isPro?'':'-gold');
+  document.querySelectorAll('.mb-opt').forEach(function(o,i){o.className='mb-opt'+((i===0&&mode==='monthly')||(i===1&&mode==='annual')?' '+sel:'');});
+  var price=mode==='annual'?(isPro?'$79':'$159'):(isPro?'$99':'$199');
+  document.getElementById('modalPlanPrice').textContent=price+' MXN/mes';
+}
+
+function closeModal(){document.getElementById('upgradeModal').classList.remove('active');}
+function closeModalOutside(e){if(e.target===document.getElementById('upgradeModal'))closeModal();}
+function confirmUpgrade(){closeModal();showToast('🎉 ¡Bienvenido al plan '+(currentModalPlan==='pro'?'Pro':'Elite')+'!');}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
+
+buildCompare();
+buildAddons('pro');
+buildFAQ();
+</script>
+</body>
+</html>
