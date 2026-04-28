@@ -8,8 +8,8 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
   --qx-green:#1DB954;--qx-green-light:#7ED957;--qx-gold:#F5C518;
-  --qx-blue:#1A3FA8;--qx-purple:#8B5CF6;
-  --qx-bg:#0B1529;--qx-card:#132040;--qx-card2:#1A2D55;
+  --qx-blue:#1A3FA8;
+  --qx-bg:#0B1529;--qx-card:#132040;
   --qx-text:#F0F4FF;--qx-muted:#8A9FCC;--qx-border:rgba(255,255,255,0.1);
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:var(--qx-text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;}
@@ -36,11 +36,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--qx-border);}
 .link-row{text-align:center;font-size:13px;color:var(--qx-muted);margin-top:1rem;}
 .link-row a{color:var(--qx-green);text-decoration:none;font-weight:600;}
-.link-row a:hover{text-decoration:underline;}
-.loading{opacity:.7;cursor:default;}
 </style>
 </head>
-<body>document.getElementById('btnLogin').addEventListener('click', handleLogin);
+<body>
 <div class="bg-deco">
   <div class="bg-circle bg-c1"></div>
   <div class="bg-circle bg-c2"></div>
@@ -50,33 +48,28 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:v
   <a href="index.html" class="logo">QUINI<span>X</span></a>
   <div class="card-title">Bienvenido de vuelta</div>
   <div class="card-sub">Ingresa tus datos para acceder a tu cuenta.</div>
-
   <div class="form-group">
     <label class="form-label">Correo electrónico</label>
     <input class="form-input" id="email" type="email" placeholder="tu@correo.com">
   </div>
   <div class="form-group">
     <label class="form-label">Contraseña</label>
-    <input class="form-input" id="password" type="password" placeholder="Tu contraseña" onkeydown="if(event.key==='Enter')handleLogin()">
+    <input class="form-input" id="password" type="password" placeholder="Tu contraseña">
   </div>
-
   <div class="error-msg" id="errorMsg"></div>
-
-<button class="btn-primary" id="btnLogin">Entrar a QUINIX</button>
+  <button class="btn-primary" id="btnLogin">Entrar a QUINIX</button>
   <div class="divider">o</div>
-
   <div class="link-row">
     ¿No tienes cuenta? <a href="onboarding.html">Regístrate gratis</a>
   </div>
 </div>
 
 <script>
-// Si ya hay sesión, ir al dashboard
 if(localStorage.getItem('quinix_session')){
   window.location.href = 'dashboard.html';
 }
 
-async function handleLogin(){
+document.getElementById('btnLogin').addEventListener('click', function() {
   var email = document.getElementById('email').value.trim();
   var password = document.getElementById('password').value;
   var btn = document.getElementById('btnLogin');
@@ -90,10 +83,38 @@ async function handleLogin(){
 
   btn.disabled = true;
   btn.textContent = 'Entrando...';
-  btn.classList.add('loading');
   errEl.classList.remove('show');
 
-  try {
-    var res = await fetch('https://quinix-api-proxy.vercel.app/api/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application
+  fetch('https://quinix-api-proxy.vercel.app/api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'login', email: email, password: password })
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(data){
+    if(data.error){
+      errEl.textContent = data.error === 'Invalid login credentials' ? 'Email o contraseña incorrectos.' : data.error;
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Entrar a QUINIX';
+      return;
+    }
+    var username = email.split('@')[0];
+    localStorage.setItem('quinix_session', JSON.stringify({ username: username, email: email, plan: 'amateur' }));
+    if(data.access_token) localStorage.setItem('quinix_token', data.access_token);
+    window.location.href = 'dashboard.html';
+  })
+  .catch(function(){
+    errEl.textContent = 'Error de conexión. Intenta de nuevo.';
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Entrar a QUINIX';
+  });
+});
+
+document.getElementById('password').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') document.getElementById('btnLogin').click();
+});
+</script>
+</body>
+</html>
