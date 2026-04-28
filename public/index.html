@@ -234,5 +234,19 @@ function setBilling(mode){
   document.getElementById('eliteNote').textContent = isAnnual?'Facturado $1,908 al año':'Facturado mensualmente';
 }
 </script>
-</body>
+<script>
+// Verificar si hay sesión activa
+const session = localStorage.getItem('quinix_session');
+if (session) {
+  // Usuario ya logueado, actualizar botones
+  const navActions = document.querySelector('.nav-actions');
+  if (navActions) {
+    const userData = JSON.parse(session);
+    navActions.innerHTML = `
+      <a href="dashboard.html" class="btn btn-outline">Mi dashboard</a>
+      <a href="perfil.html" class="btn btn-primary">@${userData.username || 'Mi perfil'}</a>
+    `;
+  }
+}
+</script></body>
 </html>
