@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUINIX — Perfil</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --qx-green:#1DB954;--qx-green-light:#7ED957;--qx-gold:#F5C518;
+  --qx-red:#D62828;--qx-blue:#1A3FA8;--qx-purple:#8B5CF6;
+  --qx-bg:#0B1529;--qx-card:#132040;--qx-card2:#1A2D55;
+  --qx-text:#F0F4FF;--qx-muted:#8A9FCC;--qx-border:rgba(255,255,255,0.1);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:var(--qx-text);min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid var(--qx-border);background:var(--qx-card);position:sticky;top:0;z-index:20;}
+.logo{font-size:16px;font-weight:900;letter-spacing:1px;text-decoration:none;color:var(--qx-text);}
+.logo span{color:var(--qx-green-light);}
+.btn-back{background:none;border:1.5px solid var(--qx-border);color:var(--qx-muted);padding:5px 12px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;text-decoration:none;}
+.layout{max-width:860px;margin:0 auto;padding:1.5rem 1.25rem;display:grid;grid-template-columns:220px 1fr;gap:1.25rem;align-items:start;}
+.profile-sidebar{display:flex;flex-direction:column;gap:1rem;}
+.avatar-card{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:14px;padding:1.5rem;text-align:center;}
+.avatar-wrap{position:relative;width:80px;height:80px;margin:0 auto 1rem;}
+.avatar-circle{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;border:3px solid var(--qx-border);overflow:hidden;cursor:pointer;transition:border-color .2s;}
+.avatar-circle:hover{border-color:var(--qx-green);}
+.avatar-circle img{width:100%;height:100%;object-fit:cover;}
+.avatar-edit-btn{position:absolute;bottom:0;right:0;width:24px;height:24px;background:var(--qx-green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;border:2px solid var(--qx-bg);}
+.user-name{font-size:16px;font-weight:800;margin-bottom:3px;}
+.user-handle{font-size:12px;color:var(--qx-muted);}
+.plan-pill{display:inline-block;margin-top:8px;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--qx-muted);border:1px solid var(--qx-border);}
+.sidebar-nav{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:14px;overflow:hidden;}
+.snav-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;font-weight:500;color:var(--qx-muted);cursor:pointer;border-left:3px solid transparent;transition:all .15s;}
+.snav-item:hover{color:var(--qx-text);background:rgba(255,255,255,.03);}
+.snav-item.active{color:var(--qx-green);border-left-color:var(--qx-green);background:rgba(29,185,84,.06);}
+.snav-item+.snav-item{border-top:1px solid var(--qx-border);}
+.main-content{display:flex;flex-direction:column;gap:1rem;}
+.section-card{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:14px;padding:1.5rem;display:none;}
+.section-card.active{display:block;}
+.sc-title{font-size:16px;font-weight:800;margin-bottom:4px;}
+.sc-sub{font-size:12px;color:var(--qx-muted);margin-bottom:1.5rem;line-height:1.5;}
+.section-label{font-size:11px;font-weight:700;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--qx-border);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group.full{grid-column:span 2;}
+.form-label{font-size:11px;font-weight:700;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.4px;}
+.form-input{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:8px;padding:10px 13px;color:var(--qx-text);font-size:13px;outline:none;font-family:inherit;transition:border .2s;}
+.form-input:focus{border-color:var(--qx-green);}
+.form-input::placeholder{color:var(--qx-muted);opacity:.6;}
+.form-input:disabled{opacity:.5;cursor:default;}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%238A9FCC'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer;}
+.btn-save{padding:10px 24px;background:var(--qx-green);color:#0B1529;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:1rem;}
+.btn-save:hover{background:var(--qx-green-light);}
+.btn-outline{padding:10px 24px;background:transparent;border:1.5px solid var(--qx-border);color:var(--qx-text);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:1rem;}
+.av-color-opt{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;cursor:pointer;border:2px solid transparent;transition:all .15s;color:#fff;}
+.av-color-opt.selected{border-color:#fff;transform:scale(1.1);}
+.avatar-options{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1rem;}
+.upload-area{border:1.5px dashed var(--qx-border);border-radius:10px;padding:1.25rem;text-align:center;cursor:pointer;transition:border-color .2s;}
+.upload-area:hover{border-color:var(--qx-green);}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--qx-border);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-info{flex:1;}
+.toggle-label{font-size:13px;font-weight:600;}
+.toggle-desc{font-size:11px;color:var(--qx-muted);margin-top:2px;}
+.toggle-sm{width:36px;height:20px;background:var(--qx-card2);border:1px solid var(--qx-border);border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle-sm.on{background:var(--qx-green);}
+.toggle-sm-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s;}
+.toggle-sm.on .toggle-sm-thumb{transform:translateX(16px);}
+.plan-current{background:linear-gradient(135deg,rgba(26,63,168,.3),rgba(29,185,84,.15));border:1px solid rgba(29,185,84,.25);border-radius:12px;padding:1.25rem;margin-bottom:1rem;}
+.pfl-item{font-size:12px;color:var(--qx-muted);display:flex;gap:7px;align-items:center;margin-bottom:6px;}
+.pfl-item .ck{color:var(--qx-green);font-weight:700;}
+.upgrade-banner{background:linear-gradient(135deg,rgba(245,197,24,.1),rgba(139,92,246,.1));border:1px solid rgba(245,197,24,.25);border-radius:12px;padding:1.25rem;text-align:center;}
+.upgrade-banner h3{font-size:15px;font-weight:800;margin-bottom:6px;}
+.upgrade-banner p{font-size:12px;color:var(--qx-muted);line-height:1.5;margin-bottom:1rem;}
+.btn-upgrade{padding:10px 28px;background:var(--qx-gold);color:#0B1529;border:none;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block;}
+.btn-upgrade:hover{background:#f7d045;}
+.hist-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem;}
+.hist-stat{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:.875rem;text-align:center;}
+.hs-val{font-size:20px;font-weight:800;}
+.hs-lbl{font-size:11px;color:var(--qx-muted);margin-top:2px;}
+.hist-list{display:flex;flex-direction:column;gap:8px;}
+.hist-item{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:.875rem 1rem;display:flex;align-items:center;gap:12px;}
+.hi-icon{font-size:20px;flex-shrink:0;}
+.hi-info{flex:1;}
+.hi-name{font-size:13px;font-weight:600;}
+.hi-meta{font-size:11px;color:var(--qx-muted);margin-top:2px;}
+.hi-pos{font-size:16px;font-weight:800;}
+.hi-pts{font-size:11px;color:var(--qx-muted);}
+.pos-1{color:var(--qx-gold);}.pos-2{color:#C0C0C0;}.pos-3{color:#CD7F32;}
+.security-item{padding:1rem 0;border-bottom:1px solid var(--qx-border);}
+.security-item:last-child{border-bottom:none;}
+.si-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.si-title{font-size:13px;font-weight:700;}
+.si-desc{font-size:11px;color:var(--qx-muted);line-height:1.4;}
+.btn-sm{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--qx-border);background:transparent;color:var(--qx-muted);}
+.btn-sm:hover{border-color:var(--qx-text);color:var(--qx-text);}
+.connected-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(29,185,84,.12);color:var(--qx-green);}
+.danger-zone{border:1px solid rgba(214,40,40,.25);border-radius:12px;padding:1.25rem;margin-bottom:1rem;}
+.dz-title{font-size:13px;font-weight:700;color:#ff6b6b;margin-bottom:4px;}
+.dz-desc{font-size:12px;color:var(--qx-muted);line-height:1.5;margin-bottom:1rem;}
+.btn-danger{padding:9px 20px;background:transparent;border:1.5px solid rgba(214,40,40,.4);color:#ff6b6b;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
+.btn-danger:hover{background:rgba(214,40,40,.1);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:16px;padding:1.75rem;width:90%;max-width:380px;text-align:center;}
+.modal-icon{font-size:38px;margin-bottom:.75rem;}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--qx-muted);line-height:1.5;margin-bottom:1.5rem;}
+.modal-btns{display:flex;gap:10px;}
+.mbtn{flex:1;padding:11px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;}
+.mbtn-cancel{background:transparent;border:1.5px solid var(--qx-border);color:var(--qx-muted);}
+.mbtn-danger{background:var(--qx-red);color:#fff;}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--qx-green);color:#0B1529;padding:10px 22px;border-radius:20px;font-size:13px;font-weight:700;z-index:200;transition:transform .3s;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+@media(max-width:600px){.layout{grid-template-columns:1fr;}.form-grid{grid-template-columns:1fr;}.form-group.full{grid-column:span 1;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html" class="logo">QUINI<span>X</span></a>
+  <a href="dashboard.html" class="btn-back">← Dashboard</a>
+</div>
+
+<div class="layout">
+  <div class="profile-sidebar">
+    <div class="avatar-card">
+      <div class="avatar-wrap">
+        <div class="avatar-circle" id="avatarCircle" style="background:#1A3FA8" onclick="goSection('avatar')">
+          <span id="avatarInitials">JR</span>
+        </div>
+        <div class="avatar-edit-btn" onclick="goSection('avatar')">✏️</div>
+      </div>
+      <div class="user-name">José Ríos</div>
+      <div class="user-handle">@joserios</div>
+      <div class="plan-pill">Plan Amateur</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="snav-item active" onclick="goSection('info')"><span>👤</span> Información</div>
+      <div class="snav-item" onclick="goSection('avatar')"><span>🖼️</span> Avatar</div>
+      <div class="snav-item" onclick="goSection('seguridad')"><span>🔒</span> Seguridad</div>
+      <div class="snav-item" onclick="goSection('plan')"><span>⭐</span> Mi plan</div>
+      <div class="snav-item" onclick="goSection('notificaciones')"><span>🔔</span> Notificaciones</div>
+      <div class="snav-item" onclick="goSection('historial')"><span>📋</span> Historial</div>
+      <div class="snav-item" onclick="goSection('peligro')"><span>⚠️</span> Zona de peligro</div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- INFO -->
+    <div class="section-card active" id="sec-info">
+      <div class="sc-title">Información personal</div>
+      <div class="sc-sub">Actualiza tus datos de perfil.</div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" type="text" value="José"></div>
+        <div class="form-group"><label class="form-label">Apellido</label><input class="form-input" type="text" value="Ríos"></div>
+        <div class="form-group"><label class="form-label">Nombre de usuario</label><input class="form-input" type="text" value="joserios"></div>
+        <div class="form-group"><label class="form-label">País</label><select class="form-input form-select"><option selected>México 🇲🇽</option><option>Estados Unidos 🇺🇸</option><option>Colombia 🇨🇴</option><option>Argentina 🇦🇷</option><option>España 🇪🇸</option></select></div>
+        <div class="form-group full"><label class="form-label">Correo electrónico</label><input class="form-input" type="email" value="jose.rios@gmail.com" disabled><span style="font-size:11px;color:var(--qx-muted);margin-top:3px">El correo no puede modificarse directamente.</span></div>
+      </div>
+      <button class="btn-save" onclick="showToast('✅ Información actualizada')">Guardar cambios</button>
+    </div>
+
+    <!-- AVATAR -->
+    <div class="section-card" id="sec-avatar">
+      <div class="sc-title">Avatar y apariencia</div>
+      <div class="sc-sub">Elige un color con tus iniciales o sube una foto.</div>
+      <div class="section-label">Color del avatar</div>
+      <div class="avatar-options" id="avatarColors"></div>
+      <div class="section-label" style="margin-top:1.25rem">Foto de perfil</div>
+      <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="previewAvatar(event)">
+        <div style="font-size:24px;margin-bottom:6px">📷</div>
+        <div style="font-size:12px;color:var(--qx-muted)">Haz clic para subir · JPG, PNG · Máx. 2MB</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:1rem">
+        <button class="btn-save" onclick="showToast('✅ Avatar actualizado')">Guardar avatar</button>
+        <button class="btn-outline" onclick="resetAvatar()">Restablecer iniciales</button>
+      </div>
+    </div>
+
+    <!-- SEGURIDAD -->
+    <div class="section-card" id="sec-seguridad">
+      <div class="sc-title">Seguridad</div>
+      <div class="sc-sub">Administra tu contraseña y métodos de acceso.</div>
+      <div class="security-item"><div class="si-header"><div class="si-title">Contraseña</div><button class="btn-sm" onclick="showToast('📧 Email de cambio enviado')">Cambiar</button></div><div class="si-desc">Última actualización hace 3 meses.</div></div>
+      <div class="security-item"><div class="si-header"><div class="si-title">Google <span class="connected-badge">Conectado</span></div><button class="btn-sm" onclick="showToast('🔓 Google desvinculado')">Desvincular</button></div><div class="si-desc">Vinculado con jose.rios@gmail.com</div></div>
+      <div class="security-item"><div class="si-header"><div class="si-title">Sesiones activas</div><button class="btn-sm" onclick="showToast('🔒 Sesiones cerradas')">Cerrar todas</button></div><div class="si-desc">2 sesiones activas: iPhone (hoy) y Chrome en Mac (hace 2 días).</div></div>
+    </div>
+
+    <!-- PLAN -->
+    <div class="section-card" id="sec-plan">
+      <div class="sc-title">Mi plan</div>
+      <div class="sc-sub">Gestiona tu suscripción y add-ons.</div>
+      <div class="plan-current">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <div><div style="font-size:20px;font-weight:900">Plan Amateur</div><div style="font-size:12px;color:var(--qx-muted);margin-top:3px">Gratuito · Sin fecha de vencimiento</div></div>
+          <div style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--qx-muted);border:1px solid var(--qx-border)">Activo</div>
+        </div>
+        <div style="margin-top:1rem">
+          <div class="pfl-item"><span class="ck">✓</span>1 quiniela activa</div>
+          <div class="pfl-item"><span class="ck">✓</span>Liga MX y Liga MX Femenil</div>
+          <div class="pfl-item"><span class="ck">✓</span>Hasta 10 participantes</div>
+        </div>
+      </div>
+      <div class="upgrade-banner">
+        <h3>¿Listo para más? 🚀</h3>
+        <p>Pasa a <strong style="color:var(--qx-green)">Pro</strong> por $99 MXN/mes o <strong style="color:var(--qx-gold)">Elite</strong> por $199 MXN/mes.</p>
+        <a href="planes.html" class="btn-upgrade">Ver planes →</a>
+      </div>
+    </div>
+
+    <!-- NOTIFICACIONES -->
+    <div class="section-card" id="sec-notificaciones">
+      <div class="sc-title">Notificaciones</div>
+      <div class="sc-sub">Elige qué avisos quieres recibir por email.</div>
+      <div id="togglesWrap"></div>
+      <button class="btn-save" onclick="showToast('✅ Preferencias guardadas')">Guardar preferencias</button>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div class="section-card" id="sec-historial">
+      <div class="sc-title">Historial de quinielas</div>
+      <div class="sc-sub">Resumen de tu actividad en QUINIX.</div>
+      <div class="hist-stats">
+        <div class="hist-stat"><div class="hs-val" style="color:var(--qx-green)">12</div><div class="hs-lbl">Quinielas jugadas</div></div>
+        <div class="hist-stat"><div class="hs-val" style="color:var(--qx-gold)">3</div><div class="hs-lbl">Torneos ganados</div></div>
+        <div class="hist-stat"><div class="hs-val" style="color:#6EB5FF">68%</div><div class="hs-lbl">% acierto global</div></div>
+      </div>
+      <div class="section-label">Últimas quinielas</div>
+      <div class="hist-list">
+        <div class="hist-item"><div class="hi-icon">🏆</div><div class="hi-info"><div class="hi-name">Quiniela Apertura 2025</div><div class="hi-meta">Liga MX · 8 participantes</div></div><div style="text-align:right"><div class="hi-pos pos-1">1°</div><div class="hi-pts">142 pts</div></div></div>
+        <div class="hist-item"><div class="hi-icon">⚽</div><div class="hi-info"><div class="hi-name">La Clásica del Trabajo</div><div class="hi-meta">Liga MX Femenil · 6 participantes</div></div><div style="text-align:right"><div class="hi-pos pos-2">2°</div><div class="hi-pts">118 pts</div></div></div>
+        <div class="hist-item"><div class="hi-icon">🎯</div><div class="hi-info"><div class="hi-name">Quiniela Navideña 2024</div><div class="hi-meta">Liga MX · 10 participantes</div></div><div style="text-align:right"><div class="hi-pos pos-3">3°</div><div class="hi-pts">105 pts</div></div></div>
+      </div>
+      <div style="background:rgba(26,63,168,.1);border:1px solid rgba(26,63,168,.2);border-radius:10px;padding:1.25rem;text-align:center;margin-top:1rem">
+        <div style="font-size:20px;margin-bottom:8px">📊</div>
+        <p style="font-size:12px;color:var(--qx-muted);margin-bottom:.875rem">Historial detallado disponible en planes <strong style="color:var(--qx-green)">Pro</strong> y <strong style="color:var(--qx-gold)">Elite</strong>.</p>
+        <a href="planes.html" class="btn-upgrade">Desbloquear historial completo</a>
+      </div>
+    </div>
+
+    <!-- PELIGRO -->
+    <div class="section-card" id="sec-peligro">
+      <div class="sc-title">Zona de peligro</div>
+      <div class="sc-sub">Estas acciones son irreversibles.</div>
+      <div class="danger-zone" style="margin-bottom:1rem">
+        <div class="dz-title">🗑️ Eliminar mi cuenta</div>
+        <div class="dz-desc">Se eliminarán permanentemente tu cuenta, quinielas e historial.</div>
+        <button class="btn-danger" onclick="openDeleteModal()">Eliminar mi cuenta</button>
+      </div>
+      <div class="danger-zone">
+        <div class="dz-title">📤 Exportar mis datos</div>
+        <div class="dz-desc">Descarga una copia de todos tus datos en formato JSON.</div>
+        <button class="btn-danger" style="border-color:rgba(138,159,204,.3);color:var(--qx-muted)" onclick="showToast('📦 Preparando exportación...')">Exportar datos</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="deleteModal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">¿Eliminar tu cuenta?</div>
+    <div class="modal-sub">Esta acción es <strong>permanente e irreversible</strong>. Se eliminarán todos tus datos.</div>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-cancel" onclick="document.getElementById('deleteModal').classList.remove('active')">Cancelar</button>
+      <button class="mbtn mbtn-danger" onclick="showToast('Cuenta eliminada');document.getElementById('deleteModal').classList.remove('active')">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var AV_COLORS=['#1A3FA8','#1DB954','#D62828','#F5C518','#8B5CF6','#F97316','#06B6D4','#EC4899'];
+var currentAvColor='#1A3FA8';
+var INITIALS='JR';
+var TOGGLES=[
+  {id:'t1',label:'Recordatorio de predicciones',desc:'Aviso antes de que cierre cada partido',on:true},
+  {id:'t2',label:'Inicio de jornada',desc:'Notificación cuando comienza una nueva jornada',on:true},
+  {id:'t3',label:'Resultados de partidos',desc:'Aviso cuando se actualizan los marcadores',on:false},
+  {id:'t4',label:'Cambios en el ranking',desc:'Cuando alguien te supera en la tabla',on:true},
+  {id:'t5',label:'Nuevos participantes',desc:'Cuando alguien se une a tu quiniela',on:false},
+  {id:'t6',label:'Novedades de QUINIX',desc:'Actualizaciones y nuevas funciones',on:false},
+];
+
+function initAvatarColors(){
+  var wrap=document.getElementById('avatarColors');
+  AV_COLORS.forEach(function(c){
+    var d=document.createElement('div');d.className='av-color-opt'+(c===currentAvColor?' selected':'');d.style.background=c;d.textContent=INITIALS;
+    d.onclick=function(){currentAvColor=c;document.querySelectorAll('.av-color-opt').forEach(function(x){x.classList.remove('selected');});d.classList.add('selected');document.getElementById('avatarCircle').style.background=c;};
+    wrap.appendChild(d);
+  });
+}
+
+function initToggles(){
+  var wrap=document.getElementById('togglesWrap');
+  TOGGLES.forEach(function(t){
+    var row=document.createElement('div');row.className='toggle-row';
+    row.innerHTML='<div class="toggle-info"><div class="toggle-label">'+t.label+'</div><div class="toggle-desc">'+t.desc+'</div></div><div class="toggle-sm'+(t.on?' on':'')+'" id="tog-'+t.id+'" onclick="document.getElementById(\'tog-'+t.id+'\').classList.toggle(\'on\')"><div class="toggle-sm-thumb"></div></div>';
+    wrap.appendChild(row);
+  });
+}
+
+function previewAvatar(e){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){var c=document.getElementById('avatarCircle');c.innerHTML='<img src="'+ev.target.result+'" alt="avatar">';};
+  reader.readAsDataURL(file);
+}
+
+function resetAvatar(){
+  var c=document.getElementById('avatarCircle');c.style.background=currentAvColor;c.innerHTML='<span id="avatarInitials">'+INITIALS+'</span>';
+}
+
+function goSection(id){
+  document.querySelectorAll('.section-card').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.snav-item').forEach(function(n){n.classList.remove('active');});
+  document.getElementById('sec-'+id).classList.add('active');
+  var map={info:0,avatar:1,seguridad:2,plan:3,notificaciones:4,historial:5,peligro:6};
+  var items=document.querySelectorAll('.snav-item');
+  if(items[map[id]])items[map[id]].classList.add('active');
+}
+
+function openDeleteModal(){document.getElementById('deleteModal').classList.add('active');}
+function closeModal(e){if(e.target.classList.contains('modal-overlay'))e.target.classList.remove('active');}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
+
+initAvatarColors();
+initToggles();
+</script>
+</body>
+</html>
