@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUINIX — Crear quiniela</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --qx-blue:#1A3FA8;--qx-green:#1DB954;--qx-green-light:#7ED957;
+  --qx-red:#D62828;--qx-gold:#F5C518;
+  --qx-bg:#0B1529;--qx-card:#132040;--qx-card2:#1A2D55;
+  --qx-text:#F0F4FF;--qx-muted:#8A9FCC;--qx-border:rgba(255,255,255,0.1);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--qx-bg);color:var(--qx-text);min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.5rem;border-bottom:1px solid var(--qx-border);background:var(--qx-card);}
+.logo-text{font-size:18px;font-weight:900;letter-spacing:1px;text-decoration:none;color:var(--qx-text);}
+.logo-text span{color:var(--qx-green-light);}
+.btn-back{background:none;border:1.5px solid var(--qx-border);color:var(--qx-muted);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;text-decoration:none;}
+.btn-back:hover{border-color:var(--qx-text);color:var(--qx-text);}
+.progress-wrap{max-width:700px;margin:2rem auto 0;padding:0 1.5rem;}
+.progress-bar-track{height:4px;background:var(--qx-card2);border-radius:4px;margin-bottom:1.25rem;}
+.progress-bar-fill{height:100%;background:var(--qx-green);border-radius:4px;transition:width .4s;}
+.steps-row{display:flex;justify-content:space-between;}
+.step-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--qx-border);background:var(--qx-card);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--qx-muted);transition:all .3s;}
+.step-dot.done{background:var(--qx-green);border-color:var(--qx-green);color:#0B1529;}
+.step-dot.current{border-color:var(--qx-green);color:var(--qx-green);}
+.step-label{font-size:10px;color:var(--qx-muted);}
+.step-label.current{color:var(--qx-green);}
+.form-card{max-width:700px;margin:1.5rem auto 2rem;padding:0 1.5rem;}
+.card{background:var(--qx-card);border:1px solid var(--qx-border);border-radius:16px;padding:2rem;}
+.card-title{font-size:20px;font-weight:800;margin-bottom:4px;}
+.card-sub{font-size:13px;color:var(--qx-muted);margin-bottom:1.75rem;line-height:1.5;}
+.form-group{margin-bottom:1.25rem;}
+.form-label{font-size:12px;font-weight:700;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block;}
+.badge-optional{font-size:10px;font-weight:500;background:rgba(255,255,255,.06);color:var(--qx-muted);padding:2px 7px;border-radius:10px;}
+.badge-pro{font-size:10px;font-weight:700;background:rgba(29,185,84,.12);color:var(--qx-green);padding:2px 8px;border-radius:10px;}
+.form-input{width:100%;background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:9px;padding:11px 14px;color:var(--qx-text);font-size:14px;outline:none;transition:border .2s;font-family:inherit;}
+.form-input:focus{border-color:var(--qx-green);}
+.form-input::placeholder{color:var(--qx-muted);opacity:.6;}
+.form-textarea{resize:vertical;min-height:72px;}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9FCC' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer;}
+.char-count{font-size:11px;color:var(--qx-muted);text-align:right;margin-top:3px;}
+.color-row{display:flex;gap:10px;flex-wrap:wrap;}
+.color-opt{width:32px;height:32px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .15s;}
+.color-opt.selected{border-color:#fff;transform:scale(1.15);}
+.leagues-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;}
+.league-card{background:var(--qx-bg);border:1.5px solid var(--qx-border);border-radius:10px;padding:.875rem 1rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;}
+.league-card:hover:not(.locked){border-color:rgba(29,185,84,.5);}
+.league-card.selected{border-color:var(--qx-green);background:rgba(29,185,84,.07);}
+.league-card.locked{opacity:.4;cursor:default;}
+.league-name{font-size:13px;font-weight:600;}
+.league-plan-tag{font-size:10px;margin-top:1px;}
+.lp-free{color:var(--qx-green);}.lp-pro{color:var(--qx-gold);}
+.alcance-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+.alcance-card{background:var(--qx-bg);border:1.5px solid var(--qx-border);border-radius:10px;padding:.875rem;cursor:pointer;transition:all .2s;text-align:center;}
+.alcance-card.selected{border-color:var(--qx-green);background:rgba(29,185,84,.07);}
+.alcance-icon{font-size:22px;margin-bottom:6px;}
+.alcance-name{font-size:13px;font-weight:700;}
+.alcance-desc{font-size:11px;color:var(--qx-muted);margin-top:3px;line-height:1.4;}
+.modo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.modo-card{background:var(--qx-bg);border:1.5px solid var(--qx-border);border-radius:10px;padding:1rem;cursor:pointer;transition:all .2s;text-align:center;}
+.modo-card:hover{border-color:rgba(29,185,84,.5);}
+.modo-card.selected{border-color:var(--qx-green);background:rgba(29,185,84,.07);}
+.modo-icon{font-size:22px;margin-bottom:5px;}
+.modo-name{font-size:13px;font-weight:700;}
+.modo-desc{font-size:11px;color:var(--qx-muted);margin-top:3px;line-height:1.4;}
+.range-row{display:flex;align-items:center;gap:14px;}
+.range-input{flex:1;accent-color:var(--qx-green);cursor:pointer;}
+.range-val{min-width:48px;background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:7px;padding:5px 10px;font-size:14px;font-weight:800;color:var(--qx-green);text-align:center;}
+.range-limits{display:flex;justify-content:space-between;font-size:10px;color:var(--qx-muted);margin-top:3px;}
+.radio-group{display:flex;flex-direction:column;gap:8px;}
+.radio-opt{display:flex;align-items:flex-start;gap:10px;background:var(--qx-bg);border:1.5px solid var(--qx-border);border-radius:9px;padding:10px 14px;cursor:pointer;transition:border .2s;}
+.radio-opt.selected{border-color:var(--qx-green);background:rgba(29,185,84,.06);}
+.radio-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--qx-border);flex-shrink:0;margin-top:2px;transition:all .15s;}
+.radio-opt.selected .radio-dot{border-color:var(--qx-green);background:var(--qx-green);}
+.radio-text{font-size:13px;font-weight:600;}
+.radio-sub{font-size:11px;color:var(--qx-muted);margin-top:2px;line-height:1.4;}
+.premio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.premio-card{background:var(--qx-bg);border:1.5px solid var(--qx-border);border-radius:10px;padding:1rem;cursor:pointer;transition:all .2s;text-align:center;}
+.premio-card:hover{border-color:rgba(245,197,24,.5);}
+.premio-card.selected{border-color:var(--qx-gold);background:rgba(245,197,24,.06);}
+.premio-icon{font-size:26px;margin-bottom:6px;}
+.premio-name{font-size:13px;font-weight:700;}
+.premio-desc{font-size:11px;color:var(--qx-muted);margin-top:4px;line-height:1.4;}
+.monto-config{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:1rem;margin-top:10px;}
+.monto-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.monto-input-wrap{position:relative;flex:1;min-width:140px;}
+.monto-prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;font-weight:700;color:var(--qx-muted);}
+.monto-input{padding-left:28px!important;}
+.monto-total{background:var(--qx-card2);border:1px solid var(--qx-border);border-radius:9px;padding:10px 16px;font-size:13px;color:var(--qx-muted);white-space:nowrap;}
+.monto-total strong{color:var(--qx-green);font-size:16px;}
+.resumen-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem;}
+.res-item{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:10px;padding:.875rem;}
+.res-label{font-size:10px;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600;margin-bottom:4px;}
+.res-val{font-size:13px;font-weight:700;}
+.res-val.green{color:var(--qx-green);}.res-val.gold{color:var(--qx-gold);}
+.bomba-resumen{background:rgba(245,197,24,.07);border:1px solid rgba(245,197,24,.2);border-radius:10px;padding:.875rem;margin-bottom:1.25rem;}
+.br-title{font-size:12px;font-weight:700;color:var(--qx-gold);margin-bottom:6px;}
+.info-box{background:rgba(26,63,168,.2);border:1px solid rgba(26,63,168,.4);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--qx-muted);line-height:1.5;margin-top:1rem;}
+.info-box strong{color:var(--qx-text);}
+.divider-label{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--qx-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin:1.5rem 0 1rem;}
+.divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--qx-border);}
+.nav-btns{display:flex;gap:10px;margin-top:1.75rem;}
+.btn-prev{flex:1;padding:12px;background:transparent;border:1.5px solid var(--qx-border);color:var(--qx-muted);border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-prev:hover{border-color:var(--qx-text);color:var(--qx-text);}
+.btn-next{flex:2;padding:12px;background:var(--qx-green);color:#0B1529;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-next:hover{background:var(--qx-green-light);}
+.btn-next:disabled{opacity:.4;cursor:default;}
+.btn-publish{flex:2;padding:12px;background:var(--qx-gold);color:#0B1529;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;}
+.btn-publish:hover{background:#f7d045;}
+.success-screen{text-align:center;padding:3rem 1rem;display:none;}
+.success-icon{font-size:56px;margin-bottom:1rem;}
+.success-title{font-size:24px;font-weight:800;margin-bottom:8px;}
+.success-sub{font-size:14px;color:var(--qx-muted);margin-bottom:2rem;line-height:1.6;}
+.link-box{background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:9px;padding:10px 16px;font-size:13px;color:var(--qx-green);font-family:monospace;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.btn-copy{background:var(--qx-green);color:#0B1529;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;}
+.success-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.sbtn{padding:10px 24px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;border:none;text-decoration:none;display:inline-block;}
+.sbtn-green{background:var(--qx-green);color:#0B1529;}
+.sbtn-outline{background:transparent;border:1.5px solid var(--qx-border);color:var(--qx-text);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="index.html" class="logo-text">QUINI<span>X</span></a>
+  <a href="dashboard.html" class="btn-back">← Volver al dashboard</a>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <div class="steps-row" id="stepsRow"></div>
+</div>
+
+<div class="form-card">
+  <div class="card" id="mainCard">
+    <div id="step1">
+      <div class="card-title">Información de tu quiniela</div>
+      <div class="card-sub">Dale un nombre y personaliza el look de tu quiniela.</div>
+      <div class="form-group">
+        <label class="form-label">Nombre de la quiniela</label>
+        <input class="form-input" id="qNombre" type="text" maxlength="50" placeholder="Ej. Quiniela de los Compadres" oninput="document.getElementById('charCount').textContent=this.value.length">
+        <div class="char-count"><span id="charCount">0</span>/50</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción <span class="badge-optional">Opcional</span></label>
+        <textarea class="form-input form-textarea" maxlength="150" placeholder="Ej. El último lugar paga las cervezas 🍺"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Color de portada</label>
+        <div class="color-row" id="colorRow"></div>
+      </div>
+      <div class="nav-btns"><button class="btn-next" onclick="goNext(1)">Siguiente →</button></div>
+    </div>
+
+    <div id="step2" style="display:none">
+      <div class="card-title">Elige el torneo</div>
+      <div class="card-sub">Plan Amateur incluye Liga MX y Liga MX Femenil. Actualiza para desbloquear más torneos.</div>
+      <div class="leagues-grid" id="leaguesGrid"></div>
+      <div class="info-box">🔒 Las ligas bloqueadas requieren plan <strong>Pro</strong> o <strong>Elite</strong>. <a href="planes.html" style="color:var(--qx-green);font-weight:600;">Actualizar plan →</a></div>
+      <div class="nav-btns">
+        <button class="btn-prev" onclick="goBack()">← Anterior</button>
+        <button class="btn-next" id="btnNext2" onclick="goNext(2)" disabled>Siguiente →</button>
+      </div>
+    </div>
+
+    <div id="step3" style="display:none">
+      <div class="card-title">Alcance de la quiniela</div>
+      <div class="card-sub" id="alcanceSub">Con el plan Amateur tu quiniela abarca el torneo completo automáticamente.</div>
+      <div class="alcance-grid" id="alcanceGrid"></div>
+      <div class="info-box" id="alcanceInfo">ℹ️ Plan <strong>Amateur</strong> incluye siempre el torneo completo. <a href="planes.html" style="color:var(--qx-green);font-weight:600;">Actualiza a Pro</a> para elegir jornadas o partidos específicos.</div>
+      <div class="nav-btns">
+        <button class="btn-prev" onclick="goBack()">← Anterior</button>
+        <button class="btn-next" id="btnNext3" onclick="goNext(3)">Siguiente →</button>
+      </div>
+    </div>
+
+    <div id="step4" style="display:none">
+      <div class="card-title">Reglas y puntuación</div>
+      <div class="card-sub">Configura cómo se ganan los puntos en tu quiniela.</div>
+      <div class="form-group">
+        <div class="form-label">Modo de predicción</div>
+        <div class="modo-grid" id="modoGrid"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Puntos por acierto</label>
+        <div class="range-row">
+          <input type="range" class="range-input" id="ptsAcierto" min="1" max="10" value="3" oninput="document.getElementById('ptsAciertoVal').textContent=this.value">
+          <div class="range-val" id="ptsAciertoVal">3</div>
+        </div>
+        <div class="range-limits"><span>1 pto</span><span>10 pts</span></div>
+      </div>
+      <div class="form-group" id="ptsExactoGroup">
+        <label class="form-label">Puntos extra por marcador exacto</label>
+        <div class="range-row">
+          <input type="range" class="range-input" id="ptsExacto" min="1" max="10" value="2" oninput="document.getElementById('ptsExactoVal').textContent=this.value">
+          <div class="range-val" id="ptsExactoVal">2</div>
+        </div>
+        <div class="range-limits"><span>1 pto</span><span>10 pts</span></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">💣 Puntos Bomba <span class="badge-pro">Pro / Elite</span></label>
+        <div style="background:var(--qx-bg);border:1px solid var(--qx-border);border-radius:9px;padding:.875rem 1rem;opacity:.45;">
+          <div style="font-size:13px;font-weight:600;color:var(--qx-muted);margin-bottom:4px;">Disponible en planes Pro y Elite</div>
+          <div style="font-size:12px;color:var(--qx-muted);">Activa partidos bomba con puntos extra por jornada. La asignación se configura jornada por jornada.</div>
+        </div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-prev" onclick="goBack()">← Anterior</button>
+        <button class="btn-next" onclick="goNext(4)">Siguiente →</button>
+      </div>
+    </div>
+
+    <div id="step5" style="display:none">
+      <div class="card-title">Participantes y cierre</div>
+      <div class="card-sub">Configura quién puede entrar y cuándo se cierran las predicciones.</div>
+      <div class="form-group">
+        <div class="form-label">Privacidad</div>
+        <div class="radio-group">
+          <div class="radio-opt selected" id="priv1" onclick="sel('priv',1,2)"><div class="radio-dot"></div><div><div class="radio-text">🔗 Solo por invitación (link)</div><div class="radio-sub">Solo quienes tengan el link pueden unirse.</div></div></div>
+          <div class="radio-opt" id="priv2" onclick="sel('priv',2,2)"><div class="radio-dot"></div><div><div class="radio-text">🌐 Pública</div><div class="radio-sub">Cualquier usuario de QUINIX puede encontrarla.</div></div></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cierre de predicciones</label>
+        <div class="radio-group">
+          <div class="radio-opt selected" id="cierre1" onclick="sel('cierre',1,2);document.getElementById('cierreCustom').style.display='none'"><div class="radio-dot"></div><div><div class="radio-text">⏱ Al inicio de cada partido</div><div class="radio-sub">Las predicciones se cierran antes de que inicie cada juego.</div></div></div>
+          <div class="radio-opt" id="cierre2" onclick="sel('cierre',2,2);document.getElementById('cierreCustom').style.display='block'"><div class="radio-dot"></div><div><div class="radio-text">🕐 Con anticipación personalizada</div><div class="radio-sub">Elige cuántos minutos antes del partido se cierra.</div></div></div>
+        </div>
+        <div id="cierreCustom" style="display:none;margin-top:10px;">
+          <select class="form-input form-select">
+            <option>5 minutos antes</option><option>10 minutos antes</option><option selected>15 minutos antes</option><option>30 minutos antes</option><option>60 minutos antes</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Aviso por email antes del cierre</label>
+        <select class="form-input form-select">
+          <option>Sin aviso</option><option>15 minutos antes</option><option selected>30 minutos antes</option><option>60 minutos antes</option><option>120 minutos antes</option>
+        </select>
+      </div>
+      <div class="divider-label">🏆 Premio</div>
+      <div class="form-group">
+        <div class="form-label">Tipo de premio</div>
+        <div class="premio-grid">
+          <div class="premio-card selected" id="premio1" onclick="selPremio(1)"><div class="premio-icon">🥇</div><div class="premio-name">Ganador absoluto</div><div class="premio-desc">El 1er lugar se lleva todo.</div></div>
+          <div class="premio-card" id="premio2" onclick="selPremio(2)"><div class="premio-icon">🏅</div><div class="premio-name">Top 3</div><div class="premio-desc">1°, 2° y 3° lugar reciben un porcentaje.</div></div>
+          <div class="premio-card" id="premio3" onclick="selPremio(3)"><div class="premio-icon">💰</div><div class="premio-name">Acumulado visible</div><div class="premio-desc">Solo se muestra el total acumulado.</div></div>
+        </div>
+      </div>
+      <div class="monto-config" id="montoConfig">
+        <div class="form-label" style="margin-bottom:10px;">Aportación por participante</div>
+        <div class="monto-row">
+          <div class="monto-input-wrap"><span class="monto-prefix">$</span><input class="form-input monto-input" id="montoInput" type="number" min="0" placeholder="Ej. 50" oninput="calcMonto()"></div>
+          <div style="font-size:12px;color:var(--qx-muted);">MXN × participantes =</div>
+          <div class="monto-total">Pozo: <strong id="montoTotal">$0</strong></div>
+        </div>
+        <div style="font-size:11px;color:var(--qx-muted);margin-top:8px;">El cobro es externo a QUINIX. La app solo muestra el total.</div>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-prev" onclick="goBack()">← Anterior</button>
+        <button class="btn-next" onclick="goNext(5)">Siguiente →</button>
+      </div>
+    </div>
+
+    <div id="step6" style="display:none">
+      <div class="card-title">Resumen de tu quiniela</div>
+      <div class="card-sub">Revisa todo antes de publicar.</div>
+      <div class="resumen-grid" id="resumenGrid"></div>
+      <div class="bomba-resumen" id="bombaResumen" style="display:none"></div>
+      <div class="info-box">✅ Tu quiniela quedará <strong>activa de inmediato</strong>. Los participantes podrán predecir conforme se acerquen los partidos.</div>
+      <div class="nav-btns">
+        <button class="btn-prev" onclick="goBack()">← Editar</button>
+        <button class="btn-publish" onclick="publicar()">🏆 Publicar quiniela</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-screen card" id="successScreen">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">¡Quiniela creada!</div>
+    <div class="success-sub">Comparte el link con tus amigos para que se unan.</div>
+    <div class="link-box"><span id="shareLink">quinix.app/q/mi-quiniela-2026</span><button class="btn-copy" onclick="copyLink()">Copiar</button></div>
+    <div class="success-btns">
+      <a href="participante.html" class="sbtn sbtn-green">Ver mi quiniela</a>
+      <a href="dashboard.html" class="sbtn sbtn-outline">Ir al dashboard</a>
+    </div>
+  </div>
+</div>
+
+<script>
+var COLORS=['#1A3FA8','#1DB954','#D62828','#F5C518','#8B5CF6','#F97316','#06B6D4','#EC4899'];
+var STEP_LABELS=['Info','Torneo','Alcance','Reglas','Participantes','Resumen'];
+var LEAGUES=[
+  {id:'ligamx',name:'Liga MX',emoji:'🇲🇽',plan:'Amateur',free:true},
+  {id:'femenil',name:'Liga MX Femenil',emoji:'⚽',plan:'Amateur',free:true},
+  {id:'premier',name:'Premier League',emoji:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',plan:'Pro',free:false},
+  {id:'laliga',name:'La Liga',emoji:'🇪🇸',plan:'Pro',free:false},
+  {id:'bundesliga',name:'Bundesliga',emoji:'🇩🇪',plan:'Pro',free:false},
+  {id:'seriea',name:'Serie A',emoji:'🇮🇹',plan:'Pro',free:false},
+  {id:'ligue1',name:'Ligue 1',emoji:'🇫🇷',plan:'Pro',free:false},
+  {id:'eredivisie',name:'Eredivisie',emoji:'🇳🇱',plan:'Pro',free:false},
+  {id:'ucl',name:'Champions League',emoji:'⭐',plan:'Pro',free:false},
+  {id:'mundial',name:'Mundial FIFA 2026',emoji:'🌍',plan:'Pro',free:false},
+];
+var MODOS=[
+  {id:'1x2',icon:'1️⃣',name:'1X2',desc:'Local, empate o visitante'},
+  {id:'exacto',icon:'🎯',name:'Marcador exacto',desc:'Adivina el marcador final'},
+  {id:'combo',icon:'💥',name:'Combinado',desc:'1X2 base + pts extra por marcador exacto'},
+];
+var S={step:1,color:COLORS[0],liga:null,alcance:'completo',modo:'combo'};
+
+function init(){
+  var cr=document.getElementById('colorRow');
+  COLORS.forEach(function(c,i){var d=document.createElement('div');d.className='color-opt'+(i===0?' selected':'');d.style.background=c;d.onclick=function(){document.querySelectorAll('.color-opt').forEach(function(x){x.classList.remove('selected');});d.classList.add('selected');S.color=c;};cr.appendChild(d);});
+  var sr=document.getElementById('stepsRow');
+  STEP_LABELS.forEach(function(l,i){var w=document.createElement('div');w.className='step-dot-wrap';var dot=document.createElement('div');dot.id='sd'+(i+1);dot.className='step-dot';dot.textContent=i+1;var lbl=document.createElement('div');lbl.id='sl'+(i+1);lbl.className='step-label';lbl.textContent=l;w.appendChild(dot);w.appendChild(lbl);sr.appendChild(w);});
+  updateSteps();showStep(1);
+}
+
+function updateSteps(){
+  document.getElementById('progressFill').style.width=(S.step/6*100)+'%';
+  for(var i=1;i<=6;i++){document.getElementById('sd'+i).className='step-dot'+(i<S.step?' done':i===S.step?' current':'');document.getElementById('sl'+i).className='step-label'+(i===S.step?' current':'');}
+}
+
+function showStep(n){
+  S.step=n;
+  for(var i=1;i<=6;i++) document.getElementById('step'+i).style.display='none';
+  document.getElementById('step'+n).style.display='block';
+  if(n===2) buildLeagues();
+  if(n===3) buildAlcance();
+  if(n===4) buildModos();
+  if(n===6) buildResumen();
+  updateSteps();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goNext(from){if(from===1&&!document.getElementById('qNombre').value.trim()){document.getElementById('qNombre').focus();return;}showStep(from+1);}
+function goBack(){showStep(S.step-1);}
+
+function buildLeagues(){
+  var g=document.getElementById('leaguesGrid');g.innerHTML='';
+  LEAGUES.forEach(function(l){var c=document.createElement('div');c.className='league-card'+(l.id===S.liga?' selected':'')+(l.free?'':' locked');c.innerHTML='<div style="font-size:20px">'+l.emoji+'</div><div><div class="league-name">'+l.name+'</div><div class="league-plan-tag '+(l.free?'lp-free':'lp-pro')+'">'+l.plan+(l.free?'':' 🔒')+'</div></div>';if(l.free)c.onclick=function(){S.liga=l.id;buildLeagues();document.getElementById('btnNext2').disabled=false;};g.appendChild(c);});
+}
+
+function buildAlcance(){
+  var g=document.getElementById('alcanceGrid');g.innerHTML='';
+  var c=document.createElement('div');c.className='alcance-card selected';c.innerHTML='<div class="alcance-icon">🏆</div><div class="alcance-name">Torneo completo</div><div class="alcance-desc">Todas las jornadas y liguilla</div>';g.appendChild(c);
+}
+
+function buildModos(){
+  var g=document.getElementById('modoGrid');g.innerHTML='';
+  MODOS.forEach(function(m){var c=document.createElement('div');c.className='modo-card'+(m.id===S.modo?' selected':'');c.innerHTML='<div class="modo-icon">'+m.icon+'</div><div class="modo-name">'+m.name+'</div><div class="modo-desc">'+m.desc+'</div>';c.onclick=function(){S.modo=m.id;document.querySelectorAll('.modo-card').forEach(function(x){x.classList.remove('selected');});c.classList.add('selected');document.getElementById('ptsExactoGroup').style.display=(S.modo==='1x2')?'none':'block';};g.appendChild(c);});
+  document.getElementById('ptsExactoGroup').style.display=(S.modo==='1x2')?'none':'block';
+}
+
+function sel(prefix,n,total){for(var i=1;i<=total;i++)document.getElementById(prefix+i).classList.toggle('selected',i===n);}
+
+function selPremio(n){[1,2,3].forEach(function(i){document.getElementById('premio'+i).classList.toggle('selected',i===n);});document.getElementById('montoConfig').style.display='block';}
+
+function calcMonto(){var m=parseFloat(document.getElementById('montoInput').value)||0;document.getElementById('montoTotal').textContent='$'+(m*10).toLocaleString('es-MX')+' MXN';}
+
+function buildResumen(){
+  var liga=LEAGUES.find(function(l){return l.id===S.liga;});
+  var modo=MODOS.find(function(m){return m.id===S.modo;});
+  var nombre=document.getElementById('qNombre').value||'(Sin nombre)';
+  var ptsA=document.getElementById('ptsAcierto').value;
+  var ptsE=document.getElementById('ptsExacto').value;
+  var monto=document.getElementById('montoInput').value;
+  var items=[
+    {l:'Nombre',v:nombre,c:''},
+    {l:'Torneo',v:liga?liga.name:'—',c:''},
+    {l:'Alcance',v:'Torneo completo',c:'green'},
+    {l:'Modo',v:modo?modo.name:'—',c:''},
+    {l:'Pts por acierto',v:ptsA+' pts',c:'green'},
+    {l:'Pts marcador exacto',v:(S.modo==='1x2')?'N/A':'+'+ptsE+' pts',c:'green'},
+    {l:'Participantes',v:'Hasta 10',c:'green'},
+    {l:'Premio',v:'Ganador absoluto',c:'gold'},
+    {l:'Aportación',v:monto?'$'+parseFloat(monto).toLocaleString('es-MX')+' MXN c/u':'No configurada',c:''},
+  ];
+  var g=document.getElementById('resumenGrid');g.innerHTML='';
+  items.forEach(function(it){var d=document.createElement('div');d.className='res-item';d.innerHTML='<div class="res-label">'+it.l+'</div><div class="res-val '+it.c+'">'+it.v+'</div>';g.appendChild(d);});
+}
+
+function publicar(){
+  document.getElementById('mainCard').style.display='none';
+  var n=document.getElementById('qNombre').value.replace(/\s+/g,'-').toLowerCase()||'mi-quiniela';
+  document.getElementById('shareLink').textContent='quinix.app/q/'+n+'-2026';
+  document.getElementById('successScreen').style.display='block';
+}
+
+function copyLink(){navigator.clipboard.writeText(document.getElementById('shareLink').textContent).then(function(){document.querySelector('.btn-copy').textContent='¡Copiado!';setTimeout(function(){document.querySelector('.btn-copy').textContent='Copiar';},2000);});}
+
+init();
+</script>
+</body>
+</html>
