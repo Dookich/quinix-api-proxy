@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUINIX</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --qx-blue: #1A3FA8;
+    --qx-blue-dark: #0F2670;
+    --qx-green: #1DB954;
+    --qx-green-light: #7ED957;
+    --qx-red: #D62828;
+    --qx-gold: #F5C518;
+    --qx-bg: #0B1529;
+    --qx-card: #132040;
+    --qx-card2: #1A2D55;
+    --qx-text: #F0F4FF;
+    --qx-muted: #8A9FCC;
+    --qx-border: rgba(255,255,255,0.1);
+  }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--qx-bg); color: var(--qx-text); min-height: 100vh; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 1px solid var(--qx-border); }
+  .nav-logo { display: flex; align-items: center; gap: 10px; }
+  .logo-badge { width: 36px; height: 36px; background: var(--qx-blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #fff; letter-spacing: -1px; border: 2px solid var(--qx-green); }
+  .logo-text { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 1px; }
+  .logo-text span { color: var(--qx-green-light); }
+  .nav-actions { display: flex; gap: 10px; }
+  .btn { padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+  .btn-outline { background: transparent; border: 1.5px solid var(--qx-border); color: var(--qx-text); }
+  .btn-outline:hover { border-color: var(--qx-green); color: var(--qx-green); }
+  .btn-primary { background: var(--qx-green); color: #0B1529; }
+  .btn-primary:hover { background: var(--qx-green-light); }
+  .btn-blue { background: var(--qx-blue); color: #fff; }
+  .btn-blue:hover { background: var(--qx-blue-dark); }
+
+  /* HERO */
+  .hero { text-align: center; padding: 4rem 2rem 3rem; position: relative; overflow: hidden; }
+  .hero-badge { display: inline-block; background: rgba(29,185,84,0.15); border: 1px solid rgba(29,185,84,0.4); color: var(--qx-green); padding: 5px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 1.5rem; }
+  .hero h1 { font-size: 48px; font-weight: 900; line-height: 1.1; margin-bottom: 1rem; }
+  .hero h1 .accent { color: var(--qx-green-light); }
+  .hero h1 .accent2 { color: var(--qx-gold); }
+  .hero p { font-size: 18px; color: var(--qx-muted); max-width: 520px; margin: 0 auto 2.5rem; line-height: 1.6; }
+  .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-hero { padding: 14px 32px; font-size: 16px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; transition: all .2s; }
+  .btn-hero-primary { background: var(--qx-green); color: #0B1529; }
+  .btn-hero-primary:hover { background: var(--qx-green-light); transform: translateY(-1px); }
+  .btn-hero-secondary { background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: var(--qx-text); }
+  .btn-hero-secondary:hover { border-color: var(--qx-blue); color: #6EB5FF; }
+
+  /* STATS BAR */
+  .stats-bar { display: flex; justify-content: center; gap: 3rem; padding: 1.5rem 2rem; border-top: 1px solid var(--qx-border); border-bottom: 1px solid var(--qx-border); margin: 0 2rem; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 24px; font-weight: 800; color: var(--qx-green-light); }
+  .stat-label { font-size: 12px; color: var(--qx-muted); margin-top: 2px; }
+
+  /* FEATURES */
+  .section { padding: 3rem 2rem; max-width: 900px; margin: 0 auto; }
+  .section-title { text-align: center; font-size: 26px; font-weight: 800; margin-bottom: 0.5rem; }
+  .section-sub { text-align: center; color: var(--qx-muted); font-size: 15px; margin-bottom: 2.5rem; }
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .feature-card { background: var(--qx-card); border: 1px solid var(--qx-border); border-radius: 14px; padding: 1.5rem; }
+  .feature-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 1rem; }
+  .fi-green { background: rgba(29,185,84,0.15); }
+  .fi-blue { background: rgba(26,63,168,0.3); }
+  .fi-gold { background: rgba(245,197,24,0.15); }
+  .fi-red { background: rgba(214,40,40,0.15); }
+  .feature-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .feature-card p { font-size: 13px; color: var(--qx-muted); line-height: 1.5; }
+
+  /* PLANES */
+  .billing-toggle { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 1.5rem 0 2rem; }
+  .billing-label { font-size: 14px; font-weight: 600; color: var(--qx-muted); cursor: pointer; transition: color .2s; }
+  .billing-label.active { color: var(--qx-text); }
+  .toggle-track { width: 48px; height: 26px; background: var(--qx-card2); border: 1px solid var(--qx-border); border-radius: 13px; cursor: pointer; position: relative; transition: background .2s; }
+  .toggle-track.annual { background: var(--qx-green); }
+  .toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: transform .2s; }
+  .toggle-track.annual .toggle-thumb { transform: translateX(22px); }
+  .save-badge { background: rgba(245,197,24,0.15); border: 1px solid rgba(245,197,24,0.4); color: var(--qx-gold); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 0; }
+  .plan-card { background: var(--qx-card); border: 1px solid var(--qx-border); border-radius: 14px; padding: 1.5rem; position: relative; display: flex; flex-direction: column; }
+  .plan-card.featured { border-color: var(--qx-green); background: var(--qx-card2); }
+  .plan-card.elite { border-color: var(--qx-gold); }
+  .plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--qx-green); color: #0B1529; font-size: 11px; font-weight: 800; padding: 4px 14px; border-radius: 20px; white-space: nowrap; }
+  .plan-badge.gold { background: var(--qx-gold); }
+  .plan-name { font-size: 12px; font-weight: 700; color: var(--qx-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .plan-price { font-size: 32px; font-weight: 900; color: var(--qx-text); line-height: 1; }
+  .plan-price span { font-size: 14px; font-weight: 400; color: var(--qx-muted); }
+  .plan-billing-note { font-size: 11px; color: var(--qx-muted); margin-top: 4px; min-height: 16px; }
+  .plan-divider { border: none; border-top: 1px solid var(--qx-border); margin: 1rem 0; }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; flex: 1; }
+  .plan-features li { font-size: 12px; color: var(--qx-muted); display: flex; gap: 7px; align-items: flex-start; line-height: 1.4; }
+  .plan-features li .check { color: var(--qx-green); font-weight: 700; flex-shrink: 0; }
+  .plan-features li .check-gold { color: var(--qx-gold); font-weight: 700; flex-shrink: 0; }
+  .plan-features li .x { color: var(--qx-muted); opacity: 0.4; flex-shrink: 0; }
+  .btn-plan { width: 100%; padding: 11px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: all .2s; }
+  .btn-plan-free { background: transparent; border: 1.5px solid var(--qx-border); color: var(--qx-text); }
+  .btn-plan-free:hover { border-color: var(--qx-text); }
+  .btn-plan-pro { background: var(--qx-green); color: #0B1529; }
+  .btn-plan-pro:hover { background: var(--qx-green-light); }
+  .btn-plan-elite { background: var(--qx-gold); color: #0B1529; }
+  .btn-plan-elite:hover { background: #f7d045; }
+  /* ADD-ONS */
+  .addons-section { margin-top: 2.5rem; }
+  .addons-tabs { display: flex; gap: 8px; margin-bottom: 1.25rem; justify-content: center; }
+  .addon-tab-btn { padding: 6px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--qx-border); background: transparent; color: var(--qx-muted); transition: all .2s; }
+  .addon-tab-btn.active-pro { border-color: var(--qx-green); color: var(--qx-green); background: rgba(29,185,84,0.08); }
+  .addon-tab-btn.active-elite { border-color: var(--qx-gold); color: var(--qx-gold); background: rgba(245,197,24,0.08); }
+  .addons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .addon-card { background: var(--qx-card); border: 1px solid var(--qx-border); border-radius: 12px; padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 4px; }
+  .addon-card.pro-addon { border-left: 3px solid var(--qx-green); }
+  .addon-card.elite-addon { border-left: 3px solid var(--qx-gold); }
+  .addon-name { font-size: 13px; font-weight: 700; }
+  .addon-desc { font-size: 12px; color: var(--qx-muted); line-height: 1.4; }
+  .addon-price { font-size: 13px; font-weight: 800; margin-top: 6px; }
+  .addon-price.pro-price { color: var(--qx-green); }
+  .addon-price.elite-price { color: var(--qx-gold); }
+
+  /* LEAGUES */
+  .leagues-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 1.5rem; }
+  .league-pill { display: flex; align-items: center; gap: 8px; background: var(--qx-card); border: 1px solid var(--qx-border); border-radius: 20px; padding: 6px 16px; font-size: 13px; }
+  .league-pill.free { border-color: rgba(29,185,84,0.4); }
+  .league-pill.pro { border-color: rgba(245,197,24,0.3); }
+  .league-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .ld-free { background: var(--qx-green); }
+  .ld-pro { background: var(--qx-gold); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: var(--qx-card); border: 1px solid var(--qx-border); border-radius: 18px; padding: 2rem; width: 90%; max-width: 400px; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+  .modal-title { font-size: 20px; font-weight: 800; }
+  .modal-close { background: none; border: none; color: var(--qx-muted); cursor: pointer; font-size: 20px; }
+  .modal-tabs { display: flex; border-bottom: 1px solid var(--qx-border); margin-bottom: 1.5rem; }
+  .modal-tab { flex: 1; text-align: center; padding: 8px; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--qx-muted); border-bottom: 2px solid transparent; transition: all .2s; }
+  .modal-tab.active { color: var(--qx-green); border-bottom-color: var(--qx-green); }
+  .form-group { margin-bottom: 1rem; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--qx-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-input { width: 100%; background: var(--qx-bg); border: 1px solid var(--qx-border); border-radius: 8px; padding: 10px 14px; color: var(--qx-text); font-size: 14px; outline: none; transition: border .2s; }
+  .form-input:focus { border-color: var(--qx-green); }
+  .form-input::placeholder { color: var(--qx-muted); opacity: 0.6; }
+  .btn-submit { width: 100%; padding: 12px; background: var(--qx-green); color: #0B1529; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 0.5rem; }
+  .btn-submit:hover { background: var(--qx-green-light); }
+  .modal-divider { text-align: center; font-size: 12px; color: var(--qx-muted); margin: 1rem 0; }
+  .social-btn { width: 100%; padding: 10px; border: 1px solid var(--qx-border); background: transparent; color: var(--qx-text); border-radius: 8px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .social-btn:hover { background: var(--qx-card2); }
+
+  /* FOOTER */
+  footer { text-align: center; padding: 2rem; color: var(--qx-muted); font-size: 13px; border-top: 1px solid var(--qx-border); margin-top: 3rem; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-badge">QX</div>
+    <span class="logo-text">QUINI<span>X</span></span>
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-outline" onclick="openModal('login')">Iniciar sesión</button>
+    <button class="btn btn-primary" onclick="openModal('register')">Registrarse gratis</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">⚽ Mundial 2026 se viene — ¡prepara tu quiniela!</div>
+  <h1>Las quinielas más<br><span class="accent">épicas</span> del <span class="accent2">futbol</span></h1>
+  <p>Crea, personaliza y comparte quinielas con tus amigos. Liga MX, Champions, Mundial y más.</p>
+  <div class="hero-btns">
+    <button class="btn-hero btn-hero-primary" onclick="openModal('register')">Crear cuenta gratis</button>
+    <button class="btn-hero btn-hero-secondary" onclick="document.getElementById('planes').scrollIntoView({behavior:'smooth'})">Ver planes</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">+5K</div><div class="stat-label">Usuarios activos</div></div>
+  <div class="stat"><div class="stat-num">+20K</div><div class="stat-label">Quinielas creadas</div></div>
+  <div class="stat"><div class="stat-num">8</div><div class="stat-label">Ligas disponibles</div></div>
+  <div class="stat"><div class="stat-num">3</div><div class="stat-label">Modos de predicción</div></div>
+</div>
+
+<!-- FEATURES -->
+<div class="section">
+  <div class="section-title">Todo lo que necesitas</div>
+  <div class="section-sub">Diseñado para los verdaderos fanáticos del futbol</div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon fi-green">🏆</div>
+      <h3>Crea tu quiniela</h3>
+      <p>Personaliza el nombre, los partidos y las reglas. Compártela con un link único.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-blue">🎯</div>
+      <h3>3 modos de predicción</h3>
+      <p>1X2 básico, marcador exacto, o modo combinado con puntos extra por adivinar ambos.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-gold">📊</div>
+      <h3>Tabla de posiciones</h3>
+      <p>Ranking en tiempo real. Ve quién va ganando y cuántos puntos te separan del líder.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-red">🌍</div>
+      <h3>Múltiples ligas</h3>
+      <p>Liga MX, Champions League, Premier League, La Liga, Mundial 2026 y más.</p>
+    </div>
+  </div>
+</div>
+
+<!-- LIGAS -->
+<div class="section" style="padding-top: 0;">
+  <div class="section-title">Ligas disponibles</div>
+  <div class="section-sub">Plan gratuito incluye las ligas mexicanas. Pro desbloquea todo.</div>
+  <div class="leagues-row">
+    <div class="league-pill free"><div class="league-dot ld-free"></div>Liga MX</div>
+    <div class="league-pill free"><div class="league-dot ld-free"></div>Liga MX Femenil</div>
+    <div class="league-pill pro"><div class="league-dot ld-pro"></div>Champions League</div>
+    <div class="league-pill pro"><div class="league-dot ld-pro"></div>Premier League</div>
+    <div class="league-pill pro"><div class="league-dot ld-pro"></div>La Liga</div>
+    <div class="league-pill pro"><div class="league-dot ld-pro"></div>Bundesliga</div>
+    <div class="league-pill pro"><div class="league-dot ld-pro"></div>Serie A</div>
+    <div class="league-pill pro"><div class="league-dot ld-pro"></div>Ligue 1</div>
+    <div class="league-pill pro"><div class="league-dot ld-pro"></div>Eredivisie</div>
+    <div class="league-pill pro"><div class="league-dot ld-pro"></div>Mundial FIFA 2026</div>
+  </div>
+  <div style="display: flex; gap: 20px; justify-content: center; margin-top: 1rem; font-size: 12px; color: var(--qx-muted);">
+    <span><span style="color: var(--qx-green); font-weight: 700;">●</span> Amateur (gratis)</span>
+    <span><span style="color: var(--qx-gold); font-weight: 700;">●</span> Pro &amp; Elite</span>
+  </div>
+</div>
+
+<!-- PLANES -->
+<div class="section" id="planes">
+  <div class="section-title">Elige tu plan</div>
+  <div class="section-sub">Empieza gratis, sube cuando quieras</div>
+
+  <div class="billing-toggle">
+    <span class="billing-label active" id="lbl-monthly" onclick="setBilling('monthly')">Mensual</span>
+    <div class="toggle-track" id="billingToggle" onclick="toggleBilling()"><div class="toggle-thumb"></div></div>
+    <span class="billing-label" id="lbl-annual" onclick="setBilling('annual')">Anual</span>
+    <span class="save-badge">Ahorra ~20%</span>
+  </div>
+
+  <div class="plans-grid">
+
+    <!-- AMATEUR -->
+    <div class="plan-card">
+      <div class="plan-name">Amateur</div>
+      <div class="plan-price">$0 <span>MXN</span></div>
+      <div class="plan-billing-note">Siempre gratis</div>
+      <hr class="plan-divider">
+      <ul class="plan-features">
+        <li><span class="check">✓</span>1 quiniela activa</li>
+        <li><span class="check">✓</span>Liga MX <em>o</em> Liga MX Femenil</li>
+        <li><span class="check">✓</span>Predicción 1X2 (local/empate/visitante)</li>
+        <li><span class="check">✓</span>Tabla de posiciones básica</li>
+        <li><span class="x">–</span><span style="opacity:.5">Ligas europeas y Mundial</span></li>
+        <li><span class="x">–</span><span style="opacity:.5">Múltiples quinielas</span></li>
+        <li><span class="x">–</span><span style="opacity:.5">Add-ons</span></li>
+      </ul>
+      <button class="btn-plan btn-plan-free" onclick="openModal('register')">Empezar gratis</button>
+    </div>
+
+    <!-- PRO -->
+    <div class="plan-card featured">
+      <div class="plan-badge">MÁS POPULAR</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price" id="pro-price">$99 <span>MXN/mes</span></div>
+      <div class="plan-billing-note" id="pro-note">Facturado mensualmente</div>
+      <hr class="plan-divider">
+      <ul class="plan-features">
+        <li><span class="check">✓</span>5 quinielas activas simultáneas</li>
+        <li><span class="check">✓</span>Hasta 30 participantes por quiniela</li>
+        <li><span class="check">✓</span>Todas las ligas (Liga MX, Femenil, Premier, La Liga, Bundesliga, Serie A, Ligue 1, Eredivisie, UCL)</li>
+        <li><span class="check">✓</span>Mundial FIFA 2026</li>
+        <li><span class="check">✓</span>3 modos de predicción</li>
+        <li><span class="check">✓</span>Tabla de posiciones avanzada</li>
+        <li><span class="check">✓</span>Puntos bomba personalizados</li>
+        <li><span class="check">✓</span>Ver predicciones de participantes</li>
+        <li><span class="check">✓</span>Notificaciones por email</li>
+        <li><span class="check">✓</span>Historial de quinielas pasadas</li>
+        <li><span class="check">✓</span>Acceso a add-ons Pro</li>
+      </ul>
+      <button class="btn-plan btn-plan-pro" onclick="openModal('register')">Obtener Pro</button>
+    </div>
+
+    <!-- ELITE -->
+    <div class="plan-card elite">
+      <div class="plan-badge gold">ELITE</div>
+      <div class="plan-name">Elite</div>
+      <div class="plan-price" id="elite-price">$199 <span>MXN/mes</span></div>
+      <div class="plan-billing-note" id="elite-note">Facturado mensualmente</div>
+      <hr class="plan-divider">
+      <ul class="plan-features">
+        <li><span class="check-gold">✓</span>15 quinielas activas simultáneas</li>
+        <li><span class="check-gold">✓</span>Hasta 100 participantes por quiniela</li>
+        <li><span class="check-gold">✓</span>Todas las ligas + Mundial 2026</li>
+        <li><span class="check-gold">✓</span>Todos los modos de predicción</li>
+        <li><span class="check-gold">✓</span>Puntos bomba personalizados</li>
+        <li><span class="check-gold">✓</span>Ver predicciones de participantes</li>
+        <li><span class="check-gold">✓</span>Notificaciones por email</li>
+        <li><span class="check-gold">✓</span>Estadísticas avanzadas</li>
+        <li><span class="check-gold">✓</span>Exportación a PDF y Excel</li>
+        <li><span class="check-gold">✓</span>Historial de quinielas pasadas</li>
+        <li><span class="check-gold">✓</span>Acceso a todos los add-ons</li>
+      </ul>
+      <button class="btn-plan btn-plan-elite" onclick="openModal('register')">Obtener Elite</button>
+    </div>
+
+  </div>
+
+  <!-- ADD-ONS -->
+  <div class="addons-section">
+    <div class="section-title" style="font-size:20px; margin-bottom: 6px;">Add-ons disponibles</div>
+    <div class="section-sub" style="margin-bottom: 1.25rem;">Potencia tu plan con funciones extra</div>
+    <div class="addons-tabs">
+      <button class="addon-tab-btn active-pro" id="addonTabPro" onclick="switchAddonTab('pro')">Plan Pro</button>
+      <button class="addon-tab-btn" id="addonTabElite" onclick="switchAddonTab('elite')">Plan Elite</button>
+    </div>
+    <div class="addons-grid" id="addonsPro">
+      <div class="addon-card pro-addon">
+        <div class="addon-name">Participantes extra</div>
+        <div class="addon-desc">+20 participantes adicionales por quiniela</div>
+        <div class="addon-price pro-price">+$29 MXN/mes</div>
+      </div>
+      <div class="addon-card pro-addon">
+        <div class="addon-name">Quiniela extra</div>
+        <div class="addon-desc">+1 quiniela activa adicional a tu plan</div>
+        <div class="addon-price pro-price">+$19 MXN/mes</div>
+      </div>
+      <div class="addon-card pro-addon">
+        <div class="addon-name">Estadísticas Pro</div>
+        <div class="addon-desc">Gráficas avanzadas y exportación de datos</div>
+        <div class="addon-price pro-price">+$29 MXN/mes</div>
+      </div>
+    </div>
+    <div class="addons-grid" id="addonsElite" style="display:none;">
+      <div class="addon-card elite-addon">
+        <div class="addon-name">Participantes extra</div>
+        <div class="addon-desc">+20 participantes adicionales por quiniela</div>
+        <div class="addon-price elite-price">+$29 MXN/mes</div>
+      </div>
+      <div class="addon-card elite-addon">
+        <div class="addon-name">Quiniela extra</div>
+        <div class="addon-desc">+1 quiniela activa adicional a tu plan</div>
+        <div class="addon-price elite-price">+$19 MXN/mes</div>
+      </div>
+      <div class="addon-card elite-addon">
+        <div class="addon-name">Estadísticas Pro</div>
+        <div class="addon-desc">Gráficas avanzadas y exportación de datos</div>
+        <div class="addon-price elite-price">+$29 MXN/mes</div>
+      </div>
+      <div class="addon-card elite-addon">
+        <div class="addon-name">Liga personalizada</div>
+        <div class="addon-desc">Crea tu propia liga mezclando partidos de cualquier torneo disponible a tu elección</div>
+        <div class="addon-price elite-price">+$29 MXN/mes</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p style="font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 6px;">QUINI<span style="color: #7ED957;">X</span></p>
+  <p>© 2026 QUINIX · Todos los derechos reservados</p>
+</footer>
+
+<!-- MODAL LOGIN/REGISTRO -->
+<div class="modal-overlay" id="authModal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Bienvenido a QUINIX</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <div class="modal-tab active" id="tab-login" onclick="switchTab('login')">Iniciar sesión</div>
+      <div class="modal-tab" id="tab-register" onclick="switchTab('register')">Registrarse</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="form-login">
+      <div class="form-group">
+        <label class="form-label">Correo electrónico</label>
+        <input type="email" class="form-input" placeholder="tu@correo.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-input" placeholder="••••••••">
+      </div>
+      <button class="btn-submit">Entrar a QUINIX</button>
+      <div class="modal-divider">o continúa con</div>
+      <button class="social-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continuar con Google
+      </button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="form-register" style="display:none;">
+      <div class="form-group">
+        <label class="form-label">Nombre de usuario</label>
+        <input type="text" class="form-input" placeholder="CaminoAlaGloria">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Correo electrónico</label>
+        <input type="email" class="form-input" placeholder="tu@correo.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-input" placeholder="Mínimo 8 caracteres">
+      </div>
+      <button class="btn-submit">Crear cuenta gratis</button>
+      <div class="modal-divider">o continúa con</div>
+      <button class="social-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Registrarse con Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let isAnnual = false;
+  function toggleBilling() { setBilling(isAnnual ? 'monthly' : 'annual'); }
+  function setBilling(mode) {
+    isAnnual = mode === 'annual';
+    document.getElementById('billingToggle').classList.toggle('annual', isAnnual);
+    document.getElementById('lbl-monthly').classList.toggle('active', !isAnnual);
+    document.getElementById('lbl-annual').classList.toggle('active', isAnnual);
+    document.getElementById('pro-price').innerHTML = isAnnual ? '$79 <span>MXN/mes</span>' : '$99 <span>MXN/mes</span>';
+    document.getElementById('pro-note').textContent = isAnnual ? 'Facturado $948 al año' : 'Facturado mensualmente';
+    document.getElementById('elite-price').innerHTML = isAnnual ? '$159 <span>MXN/mes</span>' : '$199 <span>MXN/mes</span>';
+    document.getElementById('elite-note').textContent = isAnnual ? 'Facturado $1,908 al año' : 'Facturado mensualmente';
+  }
+  function switchAddonTab(tab) {
+    document.getElementById('addonTabPro').className = 'addon-tab-btn' + (tab==='pro' ? ' active-pro' : '');
+    document.getElementById('addonTabElite').className = 'addon-tab-btn' + (tab==='elite' ? ' active-elite' : '');
+    document.getElementById('addonsPro').style.display = tab === 'pro' ? 'grid' : 'none';
+    document.getElementById('addonsElite').style.display = tab === 'elite' ? 'grid' : 'none';
+  }
+  function openModal(tab) {
+    document.getElementById('authModal').classList.add('active');
+    switchTab(tab);
+  }
+  function closeModal() {
+    document.getElementById('authModal').classList.remove('active');
+  }
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('authModal')) closeModal();
+  }
+  function switchTab(tab) {
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+  }
+</script>
+</body>
+</html>
