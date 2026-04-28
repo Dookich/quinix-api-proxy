@@ -236,7 +236,12 @@ async function handleRegister(){
       return;
     }
     // Guardar sesión
-    localStorage.setItem('quinix_session',JSON.stringify({username:state.username,email:state.email,plan:'amateur'}));
+    localStorage.setItem('quinix_session', JSON.stringify({
+  username: state.username,
+  email: state.email,
+  plan: 'amateur',
+  id: data.user_id || (data.user ? data.user.id : null)
+}));
     if(data.access_token) localStorage.setItem('quinix_token',data.access_token);
     nextStep();
   }catch(e){
