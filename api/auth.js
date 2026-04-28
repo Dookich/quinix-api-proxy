@@ -31,7 +31,11 @@ export default async function handler(req, res) {
           body: JSON.stringify({ id: signUpData.user.id, username: username, country: country || 'Mexico' })
         });
       }
-      return res.status(200).json({ user: signUpData.user, access_token: signUpData.access_token });
+      return res.status(200).json({ 
+  user: signUpData.user, 
+  access_token: signUpData.access_token,
+  user_id: signUpData.user ? signUpData.user.id : null
+});
     }
 
     if (action === 'login') {
